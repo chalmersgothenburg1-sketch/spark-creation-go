@@ -93,17 +93,16 @@ export const CustomerDashboard = () => {
   };
 
   return (
-    <div className="h-screen overflow-y-auto space-y-4 p-4">
-      <div className="flex items-center justify-between">
+    <div className="h-full overflow-y-auto space-y-4 p-6">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">My Health Dashboard</h1>
-        <Badge variant="secondary">Customer Portal</Badge>
       </div>
 
       {/* Emergency Monitor - Always at top for customers */}
       <EmergencyMonitor />
 
       {/* Health Status Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="group relative overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 border-red-200 hover:shadow-lg transition-all duration-300">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
@@ -146,25 +145,6 @@ export const CustomerDashboard = () => {
             </div>
           </div>
           <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-indigo-400"></div>
-        </Card>
-
-        <Card className="group relative overflow-hidden bg-gradient-to-br from-emerald-50 to-green-100 border-emerald-200 hover:shadow-lg transition-all duration-300">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Battery className="h-10 w-10 text-emerald-600" />
-              <div className="text-right">
-                <div className="h-3 w-8 border-2 border-emerald-600 rounded-sm relative">
-                  <div className="absolute inset-0.5 bg-emerald-500 rounded-sm" style={{ width: '78%' }}></div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <p className="text-sm text-emerald-600/70 font-medium">Device Battery</p>
-              <p className="text-3xl font-bold text-emerald-700 mb-1">78%</p>
-              <p className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-1 rounded-full inline-block">Good Level</p>
-            </div>
-          </div>
-          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-green-400"></div>
         </Card>
 
         <Card className="group relative overflow-hidden bg-gradient-to-br from-violet-50 to-purple-100 border-violet-200 hover:shadow-lg transition-all duration-300">
