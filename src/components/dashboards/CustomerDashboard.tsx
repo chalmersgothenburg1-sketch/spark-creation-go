@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { Heart, Activity, Battery, Shield, Phone, Upload, FileText, Flame, Clock, Brain, BarChart3 } from "lucide-react";
+import { Heart, Activity, Battery, Shield, Phone, Upload, FileText, Flame, Clock, Brain, BarChart3, Droplets } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { EmergencyMonitor } from "@/components/EmergencyMonitor";
@@ -14,6 +14,7 @@ import { ChatBox } from "@/components/ChatBox";
 import { StepsDetailModal } from "@/components/StepsDetailModal";
 import { HeartRateDetailModal } from "@/components/HeartRateDetailModal";
 import { CaloriesDetailModal } from "@/components/CaloriesDetailModal";
+import { SpO2DetailModal } from "@/components/SpO2DetailModal";
 import { MapCard } from "@/components/MapCard";
 
 const healthData = [
@@ -73,6 +74,7 @@ export const CustomerDashboard = () => {
   const [showStepsModal, setShowStepsModal] = useState(false);
   const [showHeartRateModal, setShowHeartRateModal] = useState(false);
   const [showCaloriesModal, setShowCaloriesModal] = useState(false);
+  const [showSpO2Modal, setShowSpO2Modal] = useState(false);
 
   const handleReportSubmit = () => {
     if (!reportRequest.trim()) {
@@ -325,7 +327,17 @@ export const CustomerDashboard = () => {
      {/* Health Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="p-6 bg-gradient-to-br from-red-50 to-pink-50 border-red-200">
-          <h3 className="text-lg font-semibold mb-4 text-red-700">Today's Heart Rate</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-red-700">Today's Heart Rate</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowHeartRateModal(true)}
+              className="h-8 w-8 p-0 hover:bg-red-100 text-red-600"
+            >
+              <BarChart3 className="h-4 w-4" />
+            </Button>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={healthData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -351,13 +363,37 @@ export const CustomerDashboard = () => {
           </ResponsiveContainer>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-          <h3 className="text-lg font-semibold mb-4 text-blue-700">Daily Activity</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={healthData}>
+        <Card className="p-6 bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-teal-700 flex items-center gap-2">
+              <Droplets className="h-5 w-5" />
+              Blood Oxygen (SpO2)
+            </h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSpO2Modal(true)}
+              className="h-8 w-8 p-0 hover:bg-teal-100 text-teal-600"
+            >
+              <BarChart3 className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="text-center mb-4">
+            <div className="text-4xl font-bold text-teal-700 mb-1">98%</div>
+            <div className="text-sm text-teal-600 bg-teal-50 px-3 py-1 rounded-full inline-block">Normal Range</div>
+          </div>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={[
+              { time: "6:00", spo2: 98 },
+              { time: "9:00", spo2: 97 },
+              { time: "12:00", spo2: 98 },
+              { time: "15:00", spo2: 99 },
+              { time: "18:00", spo2: 97 },
+              { time: "21:00", spo2: 98 },
+            ]}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis dataKey="time" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
+              <YAxis domain={[95, 100]} tick={{ fontSize: 12 }} />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'white',
@@ -366,20 +402,15 @@ export const CustomerDashboard = () => {
                   boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                 }}
               />
-              <Area 
+              <Line 
                 type="monotone" 
-                dataKey="steps" 
-                stroke="#2563eb" 
-                fill="url(#blueGradient)"
-                strokeWidth={2}
+                dataKey="spo2" 
+                stroke="#0d9488" 
+                strokeWidth={3}
+                dot={{ fill: '#0d9488', r: 4 }}
+                activeDot={{ r: 6, fill: '#0d9488' }}
               />
-              <defs>
-                <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                </linearGradient>
-              </defs>
-            </AreaChart>
+            </LineChart>
           </ResponsiveContainer>
         </Card>
       </div>
@@ -439,6 +470,9 @@ export const CustomerDashboard = () => {
       
       {/* Calories Detail Modal */}
       <CaloriesDetailModal isOpen={showCaloriesModal} onClose={() => setShowCaloriesModal(false)} />
+
+      {/* SpO2 Detail Modal */}
+      <SpO2DetailModal isOpen={showSpO2Modal} onClose={() => setShowSpO2Modal(false)} />
 
       {/* AI Chatbox */}
       <ChatBox />

@@ -190,18 +190,21 @@ export const Dashboard = () => {
 
         <div className="flex items-center space-x-4">
           {userRole === 'customer' && (
-            <div className="flex items-center gap-2 px-3 py-1 bg-muted/50 rounded-full border">
-              <div className="relative">
-                <div className="h-4 w-6 border-2 border-emerald-600 rounded-sm relative">
-                  <div className="absolute inset-0.5 bg-emerald-500 rounded-sm" style={{ width: '78%' }}></div>
+            <div className="flex items-center gap-3 px-3 py-2 bg-muted/30 rounded-lg border border-border/50">
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <div className="h-4 w-6 border-2 border-emerald-600 rounded-sm relative bg-background">
+                    <div className="absolute inset-0.5 bg-emerald-500 rounded-sm" style={{ width: '78%' }}></div>
+                  </div>
+                  <div className="absolute -top-0.5 -right-0.5 w-1 h-2 bg-emerald-600 rounded-r-sm"></div>
                 </div>
-                <div className="absolute -top-0.5 -right-0.5 w-1 h-2 bg-emerald-600 rounded-r-sm"></div>
+                <span className="text-sm font-medium text-emerald-700">78%</span>
               </div>
-              <span className="text-sm font-medium text-emerald-700">78%</span>
+              <div className="h-4 w-px bg-border"></div>
+              <Badge variant="secondary" className="text-xs">Customer Portal</Badge>
             </div>
           )}
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs">Customer Portal</Badge>
             <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
           </div>
           <ThemeToggle />

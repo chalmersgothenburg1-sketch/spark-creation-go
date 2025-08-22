@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { supabase } from "@/integrations/supabase/client";
 import { Heart, Activity, Moon, Footprints, Thermometer } from "lucide-react";
 
-interface HealthMetric {
-  id: string;
-  metric_type: string;
-  value: any;
-  recorded_at: string;
-}
+const mockData = [
+  { time: "6:00", heart_rate: 68, steps: 0, sleep: 8, temperature: 98.2 },
+  { time: "9:00", heart_rate: 72, steps: 2500, sleep: 8, temperature: 98.4 },
+  { time: "12:00", heart_rate: 78, steps: 5200, sleep: 8, temperature: 98.6 },
+  { time: "15:00", heart_rate: 75, steps: 7800, sleep: 8, temperature: 98.5 },
+  { time: "18:00", heart_rate: 70, steps: 9200, sleep: 8, temperature: 98.3 },
+  { time: "21:00", heart_rate: 65, steps: 10500, sleep: 8, temperature: 98.1 },
+];
 
 const chartConfig = {
   heart_rate: {
@@ -32,73 +32,11 @@ const chartConfig = {
 } as const;
 
 export const HealthCharts = () => {
-  const [metrics, setMetrics] = useState<HealthMetric[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchHealthMetrics();
-    
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('health-metrics-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'health_metrics'
-        },
-        () => {
-          fetchHealthMetrics();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const fetchHealthMetrics = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('health_metrics')
-        .select('*')
-        .order('recorded_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-      setMetrics(data || []);
-    } catch (error) {
-      console.error('Error fetching health metrics:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getMetricsByType = (type: string) => {
-    return metrics
-      .filter(m => m.metric_type === type)
-      .map(m => ({
-        time: new Date(m.recorded_at).toLocaleTimeString(),
-        value: typeof m.value === 'object' ? m.value.value : m.value,
-        date: new Date(m.recorded_at).toLocaleDateString()
-      }))
-      .reverse()
-      .slice(-10);
-  };
-
-  const getCurrentValue = (type: string) => {
-    const latest = metrics.find(m => m.metric_type === type);
-    if (!latest) return 0;
-    return typeof latest.value === 'object' ? latest.value.value : latest.value;
-  };
-
   const metricCards = [
     {
       type: 'heart_rate',
       title: 'Heart Rate',
-      value: getCurrentValue('heart_rate'),
+      value: 72,
       unit: 'bpm',
       icon: Heart,
       color: 'text-red-500'
@@ -106,7 +44,7 @@ export const HealthCharts = () => {
     {
       type: 'steps',
       title: 'Daily Steps',
-      value: getCurrentValue('steps'),
+      value: 10500,
       unit: 'steps',
       icon: Footprints,
       color: 'text-blue-500'
@@ -114,7 +52,7 @@ export const HealthCharts = () => {
     {
       type: 'sleep',
       title: 'Sleep Hours',
-      value: getCurrentValue('sleep'),
+      value: 8,
       unit: 'hrs',
       icon: Moon,
       color: 'text-purple-500'
@@ -122,30 +60,12 @@ export const HealthCharts = () => {
     {
       type: 'temperature',
       title: 'Body Temperature',
-      value: getCurrentValue('temperature'),
+      value: 98.3,
       unit: '°F',
       icon: Thermometer,
       color: 'text-orange-500'
     }
   ];
-
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i} className="h-48">
-            <CardContent className="p-6">
-              <div className="animate-pulse space-y-4">
-                <div className="h-4 bg-muted rounded w-1/2"></div>
-                <div className="h-8 bg-muted rounded w-3/4"></div>
-                <div className="h-20 bg-muted rounded"></div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -185,14 +105,14 @@ export const HealthCharts = () => {
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={getMetricsByType('heart_rate')}>
+                <LineChart data={mockData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="time" />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Line 
                     type="monotone" 
-                    dataKey="value" 
+                    dataKey="heart_rate" 
                     stroke="var(--color-heart_rate)" 
                     strokeWidth={2}
                   />
@@ -213,12 +133,12 @@ export const HealthCharts = () => {
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={getMetricsByType('steps')}>
+                <BarChart data={mockData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="time" />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="value" fill="var(--color-steps)" />
+                  <Bar dataKey="steps" fill="var(--color-steps)" />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -236,14 +156,14 @@ export const HealthCharts = () => {
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={getMetricsByType('sleep')}>
+                <LineChart data={mockData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="time" />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Line 
                     type="monotone" 
-                    dataKey="value" 
+                    dataKey="sleep" 
                     stroke="var(--color-sleep)" 
                     strokeWidth={2}
                   />
@@ -264,14 +184,14 @@ export const HealthCharts = () => {
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={getMetricsByType('temperature')}>
+                <LineChart data={mockData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="time" />
                   <YAxis domain={[96, 102]} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Line 
                     type="monotone" 
-                    dataKey="value" 
+                    dataKey="temperature" 
                     stroke="var(--color-temperature)" 
                     strokeWidth={2}
                   />

@@ -2,7 +2,6 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, Shield } from "lucide-react";
 
@@ -22,59 +21,13 @@ export const InsuranceUpload = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const uploadFile = async (file: File): Promise<string | null> => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('insurance')
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage
-        .from('insurance')
-        .getPublicUrl(fileName);
-
-      return data.publicUrl;
-    } catch (error) {
-      console.error('Upload error:', error);
-      return null;
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
-      let fileUrl = null;
-      const file = fileInputRef.current?.files?.[0];
-      
-      if (file) {
-        fileUrl = await uploadFile(file);
-        if (!fileUrl) {
-          throw new Error("Failed to upload file");
-        }
-      }
-
-      const { error } = await supabase
-        .from('insurance_details')
-        .insert({
-          user_id: user.id,
-          ...formData,
-          file_url: fileUrl,
-          expiry_date: formData.expiry_date || null
-        });
-
-      if (error) throw error;
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       toast.success("Insurance details added successfully");
       setFormData({
