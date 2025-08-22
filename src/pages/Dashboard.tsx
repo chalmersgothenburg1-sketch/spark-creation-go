@@ -13,7 +13,6 @@ import { SettingsDashboard } from "@/components/dashboards/SettingsDashboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
   Heart, 
   Activity, 
@@ -151,23 +150,18 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background">
       {/* Header with Navigation Tabs */}
       <header className="h-16 flex items-center justify-between border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 px-6">
-        <div className="flex items-center flex-1">
+        <div className="flex items-center">
           <h1 className="text-xl font-semibold text-foreground mr-8">WeCareWell</h1>
           
           {userRole === 'customer' ? (
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 max-w-2xl">
-              <TabsList className="grid grid-cols-5 w-full h-12 bg-muted/30 border border-border/50 p-1">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
+              <TabsList className="grid grid-cols-5 w-full max-w-md">
                 {dashboardNavItems.map((item) => (
-                  <TabsTrigger 
-                    key={item.id} 
-                    value={item.id} 
-                    className="flex items-center gap-2 text-sm font-medium data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all"
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span className="hidden md:inline">{item.label}</span>
+                  <TabsTrigger key={item.id} value={item.id} className="text-xs">
+                    {item.label}
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -189,24 +183,7 @@ export const Dashboard = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          {userRole === 'customer' && (
-            <div className="flex items-center gap-3 px-3 py-2 bg-muted/30 rounded-lg border border-border/50">
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <div className="h-4 w-6 border-2 border-emerald-600 rounded-sm relative bg-background">
-                    <div className="absolute inset-0.5 bg-emerald-500 rounded-sm" style={{ width: '78%' }}></div>
-                  </div>
-                  <div className="absolute -top-0.5 -right-0.5 w-1 h-2 bg-emerald-600 rounded-r-sm"></div>
-                </div>
-                <span className="text-sm font-medium text-emerald-700">78%</span>
-              </div>
-              <div className="h-4 w-px bg-border"></div>
-              <Badge variant="secondary" className="text-xs">Customer Portal</Badge>
-            </div>
-          )}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
-          </div>
+          <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
           <ThemeToggle />
           <Button
             variant="outline"
@@ -221,8 +198,8 @@ export const Dashboard = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden">
-        <div className="h-full">
+      <main className="flex-1 p-6">
+        <div className="max-w-7xl mx-auto">
           {renderDashboard()}
         </div>
       </main>

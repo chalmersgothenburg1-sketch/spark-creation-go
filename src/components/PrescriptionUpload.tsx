@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, FileText } from "lucide-react";
 
@@ -23,13 +24,60 @@ export const PrescriptionUpload = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const uploadFile = async (file: File): Promise<string | null> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('prescriptions')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('prescriptions')
+        .getPublicUrl(fileName);
+
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Upload error:', error);
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      let fileUrl = null;
+      const file = fileInputRef.current?.files?.[0];
+      
+      if (file) {
+        fileUrl = await uploadFile(file);
+        if (!fileUrl) {
+          throw new Error("Failed to upload file");
+        }
+      }
+
+      const { error } = await supabase
+        .from('prescriptions')
+        .insert({
+          user_id: user.id,
+          ...formData,
+          file_url: fileUrl,
+          start_date: formData.start_date || null,
+          end_date: formData.end_date || null
+        });
+
+      if (error) throw error;
 
       toast.success("Prescription added successfully");
       setFormData({
