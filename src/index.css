@@ -2,41 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* WeCareWell Design System - Healthcare & Senior Care Focus */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Healthcare Brand Colors */
+    --background: 240 25% 97%;
+    --foreground: 213 27% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 213 27% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 213 27% 20%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* WeCareWell Brand Blue */
+    --primary: 213 94% 54%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 213 94% 48%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Soft Healthcare Secondary */
+    --secondary: 213 15% 95%;
+    --secondary-foreground: 213 27% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted Healthcare Tones */
+    --muted: 213 15% 95%;
+    --muted-foreground: 213 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent Colors */
+    --accent: 213 15% 95%;
+    --accent-foreground: 213 27% 25%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Trust & Safety Colors */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 25 95% 53%;
+    --warning-foreground: 0 0% 100%;
+    --emergency: 0 84% 60%;
+    --emergency-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Borders & Inputs */
+    --border: 213 27% 90%;
+    --input: 213 27% 90%;
+    --ring: 213 94% 54%;
 
-    --radius: 0.5rem;
+    /* Design System Extensions */
+    --radius: 0.75rem;
+    --shadow-soft: 0 2px 10px -2px hsl(213 27% 20% / 0.08);
+    --shadow-card: 0 4px 20px -4px hsl(213 27% 20% / 0.12);
+    --gradient-hero: linear-gradient(135deg, hsl(213 94% 54%), hsl(213 94% 48%));
+    --gradient-subtle: linear-gradient(135deg, hsl(240 25% 97%), hsl(213 15% 95%));
 
     --sidebar-background: 0 0% 98%;
 
