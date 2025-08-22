@@ -1,92 +1,125 @@
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { HeroSection } from "@/components/HeroSection";
+import { FeaturesSection } from "@/components/FeaturesSection";
+import { PlansSection } from "@/components/PlansSection";
+import { WhyUsSection } from "@/components/WhyUsSection";
+import { FAQSection } from "@/components/FAQSection";
+import { ContactSection } from "@/components/ContactSection";
+import { CTASection } from "@/components/CTASection";
+import { Heart, Activity, Shield, MessageCircle, Phone, Menu, X } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import Navigation from "@/components/ui/navigation";
-import FeatureCard from "@/components/ui/feature-card";
-import TrustBadge from "@/components/ui/trust-badge";
-import EmergencyAlert from "@/components/ui/emergency-alert";
-import ProductShowcase from "@/components/ui/product-showcase";
-import { Heart, Phone, Users, ArrowRight } from "lucide-react";
-import heroImage from "@/assets/elderly-man-hero.jpg";
 
 const Index = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navigationItems = [
+    { title: "Home", icon: Heart, action: () => window.scrollTo(0, 0) },
+    { title: "Features", icon: Activity, action: () => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }) },
+    { title: "Plans", icon: Shield, action: () => document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' }) },
+    { title: "Why Us", icon: MessageCircle, action: () => document.getElementById('why-us')?.scrollIntoView({ behavior: 'smooth' }) },
+    { title: "FAQs", icon: Phone, action: () => document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth' }) },
+  ];
+
+  const handleNavigation = (item: any) => {
+    item.action();
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <title>WeCareWell - Peace of Mind for Your Loved Ones | Advanced Health Monitoring</title>
-      <meta name="description" content="Advanced health monitoring with instant emergency response, real-time family notifications, and comprehensive care services for your elderly loved ones." />
-      
-      <Navigation />
-      
-      <main>
-        <section className="relative px-6 py-16 lg:py-24">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left Content */}
-              <div className="space-y-8">
-                <div className="space-y-6">
-                  <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
-                    <span className="text-foreground">Peace of Mind for</span>
-                    <br />
-                    <span className="text-primary">Your Loved Ones</span>
-                  </h1>
-                  
-                  <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
-                    Advanced health monitoring with instant emergency response, real-time family notifications, and comprehensive care services.
-                  </p>
-                </div>
-                
-                {/* Feature Cards */}
-                <div className="space-y-4">
-                  <FeatureCard 
-                    icon={<Heart className="w-6 h-6 text-primary" />}
-                    title="24/7 Health Monitoring"
-                  />
-                  <FeatureCard 
-                    icon={<Phone className="w-6 h-6 text-primary" />}
-                    title="Instant Emergency"
-                  />
-                  <FeatureCard 
-                    icon={<Users className="w-6 h-6 text-primary" />}
-                    title="Family Connected"
-                  />
-                </div>
-                
-                {/* CTA Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button variant="hero" size="lg" className="group">
-                    Get Started Today
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                  <Button variant="demo" size="lg">
-                    Watch Demo
-                  </Button>
-                </div>
-                
-                {/* Trust Badges */}
-                <div className="flex flex-wrap gap-6 pt-4">
-                  <TrustBadge icon="✓" text="FDA Approved" color="success" />
-                  <TrustBadge icon="✓" text="HIPAA Compliant" color="primary" />
-                  <TrustBadge icon="⭕" text="24/7 Support" color="emergency" />
-                </div>
-              </div>
-              
-              {/* Right Content - Hero Image */}
-              <div className="relative">
-                <div className="relative rounded-2xl overflow-hidden shadow-lg">
-                  <img 
-                    src={heroImage}
-                    alt="Happy elderly man wearing a SeniorCare health monitoring smartwatch in a peaceful park setting"
-                    className="w-full h-full object-cover"
-                  />
-                  <EmergencyAlert />
-                </div>
-                
-                {/* Product Showcase */}
-                <div className="absolute -bottom-6 -left-6 hidden lg:block">
-                  <ProductShowcase />
-                </div>
-              </div>
-            </div>
+    <div className="min-h-screen w-full">
+      {/* Modern Header with Navigation */}
+      <header className="h-20 flex items-center justify-between border-b border-border/50 bg-background/80 backdrop-blur-md sticky top-0 z-50 px-6 lg:px-8">
+        {/* Logo */}
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center mr-3">
+            <Heart className="h-6 w-6 text-white" />
           </div>
-        </section>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            WeCareWell
+          </h1>
+        </div>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-8">
+          {navigationItems.map((item) => (
+            <button
+              key={item.title}
+              onClick={() => handleNavigation(item)}
+              className="group flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-200 relative"
+            >
+              <item.icon className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform duration-200" />
+              {item.title}
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-primary/70 group-hover:w-full transition-all duration-300"></span>
+            </button>
+          ))}
+        </nav>
+
+        {/* Right Side Actions */}
+        <div className="flex items-center space-x-4">
+          <ThemeToggle />
+          <Button
+            asChild
+            className="hidden md:flex bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+          >
+            <a href="/auth">
+              Log In
+            </a>
+          </Button>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors"
+          >
+            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Navigation Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden absolute top-20 left-0 right-0 bg-background/95 backdrop-blur-md border-b border-border/50 z-40">
+          <nav className="flex flex-col p-4 space-y-2">
+            {navigationItems.map((item) => (
+              <button
+                key={item.title}
+                onClick={() => handleNavigation(item)}
+                className="flex items-center p-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/50 transition-all duration-200"
+              >
+                <item.icon className="h-4 w-4 mr-3" />
+                {item.title}
+              </button>
+            ))}
+            <Button
+              asChild
+              className="mt-4 bg-gradient-to-r from-primary to-primary/80 text-white"
+            >
+              <a href="/auth">
+                Log In
+              </a>
+            </Button>
+          </nav>
+        </div>
+      )}
+
+      {/* Page Content */}
+      <main className="overflow-auto">
+        <HeroSection />
+        <div id="features">
+          <FeaturesSection />
+        </div>
+        <div id="plans">
+          <PlansSection />
+        </div>
+        <div id="why-us">
+          <WhyUsSection />
+        </div>
+        <div id="faqs">
+          <FAQSection />
+        </div>
+        <ContactSection />
+        <CTASection />
       </main>
     </div>
   );

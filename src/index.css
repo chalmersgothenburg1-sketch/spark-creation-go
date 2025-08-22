@@ -2,56 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-/* WeCareWell Design System - Healthcare & Senior Care Focus */
+/* SeniorCare Health Watch Design System - Warm, caring, accessible */
 
 @layer base {
   :root {
-    /* Healthcare Brand Colors */
-    --background: 240 25% 97%;
-    --foreground: 213 27% 20%;
+    --background: 210 17% 98%;
+    --foreground: 215 25% 27%;
 
     --card: 0 0% 100%;
-    --card-foreground: 213 27% 20%;
+    --card-foreground: 215 25% 27%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 213 27% 20%;
+    --popover-foreground: 215 25% 27%;
 
-    /* WeCareWell Brand Blue */
-    --primary: 213 94% 54%;
+    /* Caring blue primary - trustworthy and calming */
+    --primary: 210 100% 56%;
+    --primary-glow: 210 100% 70%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 213 94% 48%;
 
-    /* Soft Healthcare Secondary */
-    --secondary: 213 15% 95%;
-    --secondary-foreground: 213 27% 25%;
+    /* Warm secondary - approachable and friendly */
+    --secondary: 25 95% 95%;
+    --secondary-foreground: 215 25% 27%;
 
-    /* Muted Healthcare Tones */
-    --muted: 213 15% 95%;
-    --muted-foreground: 213 15% 45%;
+    /* Soft muted tones */
+    --muted: 210 17% 95%;
+    --muted-foreground: 215 16% 47%;
 
-    /* Accent Colors */
-    --accent: 213 15% 95%;
-    --accent-foreground: 213 27% 25%;
+    /* Gentle accent - health-focused green */
+    --accent: 150 60% 88%;
+    --accent-foreground: 150 100% 25%;
 
-    /* Trust & Safety Colors */
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
-    --warning: 25 95% 53%;
-    --warning-foreground: 0 0% 100%;
-    --emergency: 0 84% 60%;
+    /* Emergency red - clear but not alarming */
+    --emergency: 0 75% 60%;
     --emergency-foreground: 0 0% 100%;
 
-    /* Borders & Inputs */
-    --border: 213 27% 90%;
-    --input: 213 27% 90%;
-    --ring: 213 94% 54%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-    /* Design System Extensions */
-    --radius: 0.75rem;
-    --shadow-soft: 0 2px 10px -2px hsl(213 27% 20% / 0.08);
-    --shadow-card: 0 4px 20px -4px hsl(213 27% 20% / 0.12);
-    --gradient-hero: linear-gradient(135deg, hsl(213 94% 54%), hsl(213 94% 48%));
-    --gradient-subtle: linear-gradient(135deg, hsl(240 25% 97%), hsl(213 15% 95%));
+    --border: 210 20% 92%;
+    --input: 210 20% 92%;
+    --ring: 210 100% 56%;
+
+    /* Beautiful gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(210 100% 56%), hsl(210 100% 70%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 17% 98%));
+    --gradient-feature: linear-gradient(135deg, hsl(150 60% 88%), hsl(150 40% 92%));
+    
+    /* Elegant shadows */
+    --shadow-soft: 0 4px 12px -2px hsl(210 100% 56% / 0.1);
+    --shadow-card: 0 8px 30px -8px hsl(215 25% 27% / 0.15);
+    --shadow-hero: 0 20px 60px -12px hsl(210 100% 56% / 0.25);
+
+    /* Smooth transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
 
