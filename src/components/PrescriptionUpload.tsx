@@ -54,31 +54,9 @@ export const PrescriptionUpload = () => {
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
-      let fileUrl = null;
-      const file = fileInputRef.current?.files?.[0];
+      // Simulate upload delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (file) {
-        fileUrl = await uploadFile(file);
-        if (!fileUrl) {
-          throw new Error("Failed to upload file");
-        }
-      }
-
-      const { error } = await supabase
-        .from('prescriptions')
-        .insert({
-          user_id: user.id,
-          ...formData,
-          file_url: fileUrl,
-          start_date: formData.start_date || null,
-          end_date: formData.end_date || null
-        });
-
-      if (error) throw error;
-
       toast.success("Prescription added successfully");
       setFormData({
         medication_name: "",

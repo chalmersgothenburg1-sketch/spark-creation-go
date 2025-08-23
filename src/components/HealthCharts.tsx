@@ -37,43 +37,51 @@ export const HealthCharts = () => {
 
   useEffect(() => {
     fetchHealthMetrics();
-    
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('health-metrics-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'health_metrics'
-        },
-        () => {
-          fetchHealthMetrics();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, []);
 
   const fetchHealthMetrics = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('health_metrics')
-        .select('*')
-        .order('recorded_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-      setMetrics(data || []);
-    } catch (error) {
-      console.error('Error fetching health metrics:', error);
-    } finally {
-      setLoading(false);
+    // Generate mock data for demo
+    const mockMetrics: HealthMetric[] = [];
+    const now = new Date();
+    
+    // Generate heart rate data for last 10 readings
+    for (let i = 9; i >= 0; i--) {
+      const time = new Date(now);
+      time.setHours(time.getHours() - i);
+      
+      mockMetrics.push({
+        id: `heart-${i}`,
+        metric_type: 'heart_rate',
+        value: 68 + Math.floor(Math.random() * 25), // 68-93 bpm
+        recorded_at: time.toISOString()
+      });
+      
+      if (i % 2 === 0) {
+        mockMetrics.push({
+          id: `steps-${i}`,
+          metric_type: 'steps',
+          value: 1000 + Math.floor(Math.random() * 2000), // 1000-3000 steps
+          recorded_at: time.toISOString()
+        });
+        
+        mockMetrics.push({
+          id: `sleep-${i}`,
+          metric_type: 'sleep',
+          value: 6.5 + Math.random() * 2, // 6.5-8.5 hours
+          recorded_at: time.toISOString()
+        });
+        
+        mockMetrics.push({
+          id: `temp-${i}`,
+          metric_type: 'temperature',
+          value: 97.8 + Math.random() * 1.2, // 97.8-99°F
+          recorded_at: time.toISOString()
+        });
+      }
     }
+    
+    setMetrics(mockMetrics);
+    setLoading(false);
   };
 
   const getMetricsByType = (type: string) => {

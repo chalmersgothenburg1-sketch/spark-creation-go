@@ -25,60 +25,25 @@ export const EmergencyMonitor = () => {
 
   useEffect(() => {
     fetchEmergencyEvents();
-    
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('emergency-events-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'emergency_events'
-        },
-        () => {
-          fetchEmergencyEvents();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, []);
 
   const fetchEmergencyEvents = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('emergency_events')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (error) throw error;
-      setEmergencyEvents(data || []);
-    } catch (error) {
-      console.error('Error fetching emergency events:', error);
-    } finally {
-      setLoading(false);
-    }
+    // Using mock data for demo
+    const mockEvents: EmergencyEvent[] = [];
+    setEmergencyEvents(mockEvents);
+    setLoading(false);
   };
 
   const resolveEmergency = async (eventId: string) => {
-    try {
-      const { error } = await supabase
-        .from('emergency_events')
-        .update({ 
-          status: 'resolved',
-          resolved_at: new Date().toISOString()
-        })
-        .eq('id', eventId);
-
-      if (error) throw error;
-      toast.success('Emergency resolved');
-    } catch (error) {
-      toast.error('Error resolving emergency');
-    }
+    // Mock resolution
+    setEmergencyEvents(prev => 
+      prev.map(event => 
+        event.id === eventId 
+          ? { ...event, status: 'resolved', resolved_at: new Date().toISOString() }
+          : event
+      )
+    );
+    toast.success('Emergency resolved');
   };
 
   const activeEmergencies = emergencyEvents.filter(e => e.status === 'active');

@@ -6,9 +6,9 @@ import watchImage from "@/assets/senior-watch.jpg";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center bg-gradient-to-br from-background to-muted">
+    <section className="relative min-h-screen flex items-center bg-gradient-to-b from-primary/15 via-primary/5 to-background">
       <div className="container mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Content */}
           <div className="space-y-8">
             <div className="space-y-4">
@@ -73,36 +73,36 @@ export function HeroSection() {
           {/* Right Content - Images */}
           <div className="relative">
             {/* Hero Background Image */}
-            <div className="relative rounded-2xl overflow-hidden shadow-hero">
+            <div className="relative rounded-3xl overflow-hidden shadow-hero">
               <img 
                 src={heroImage} 
                 alt="Happy senior wearing SeniorCare health watch"
-                className="w-full h-96 lg:h-[500px] object-cover"
+                className="w-full h-[500px] lg:h-[600px] object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent"></div>
             </div>
 
             {/* Floating Watch Product */}
-            <div className="absolute -bottom-8 -left-8 lg:-left-16">
-              <div className="bg-card p-6 rounded-2xl shadow-hero border border-border">
+            <div className="absolute -bottom-12 -left-12 lg:-left-20">
+              <div className="bg-card/95 backdrop-blur-sm p-8 rounded-3xl shadow-hero border border-border/50">
                 <img 
                   src={watchImage} 
                   alt="SeniorCare Health Watch"
-                  className="w-32 h-24 object-contain"
+                  className="w-40 h-32 object-contain"
                 />
-                <div className="mt-2 text-center">
-                  <p className="text-sm font-medium text-foreground">SeniorCare Watch</p>
-                  <p className="text-xs text-muted-foreground">Starting at $199</p>
+                <div className="mt-4 text-center">
+                  <p className="text-base font-semibold text-foreground">SeniorCare Watch</p>
+                  <p className="text-sm text-primary font-medium">Starting at $199</p>
                 </div>
               </div>
             </div>
 
             {/* Floating Emergency Alert */}
-            <div className="absolute top-4 right-4 lg:top-8 lg:right-8">
-              <div className="bg-emergency text-emergency-foreground p-3 rounded-lg shadow-card animate-pulse">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-emergency-foreground rounded-full"></div>
-                  <span className="text-xs font-medium">Emergency Alert Sent</span>
+            <div className="absolute top-6 right-6 lg:top-12 lg:right-12">
+              <div className="bg-emergency/95 backdrop-blur-sm text-emergency-foreground p-4 rounded-2xl shadow-card animate-pulse">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-emergency-foreground rounded-full animate-pulse"></div>
+                  <span className="text-sm font-semibold">Emergency Alert Sent</span>
                 </div>
               </div>
             </div>
@@ -111,8 +111,9 @@ export function HeroSection() {
       </div>
 
       {/* Background Decorations */}
-      <div className="absolute top-20 left-10 w-20 h-20 bg-primary/10 rounded-full blur-xl"></div>
-      <div className="absolute bottom-20 right-20 w-32 h-32 bg-accent/20 rounded-full blur-xl"></div>
+      <div className="absolute top-20 left-10 w-32 h-32 bg-primary/15 rounded-full blur-2xl"></div>
+      <div className="absolute bottom-20 right-20 w-40 h-40 bg-primary-glow/20 rounded-full blur-2xl"></div>
+      <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-accent/10 rounded-full blur-xl"></div>
     </section>
   );
 }
