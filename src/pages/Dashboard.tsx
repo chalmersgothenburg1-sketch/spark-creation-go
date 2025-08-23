@@ -167,20 +167,6 @@ export const Dashboard = () => {
             </h1>
           </div>
           
-          {/* Battery Indicator for Customer Portal */}
-          {userRole === 'customer' && (
-            <div className="flex items-center space-x-3 px-4 py-2 bg-card/60 backdrop-blur-sm rounded-2xl border border-border/30 shadow-soft">
-              <span className="text-sm font-medium text-muted-foreground">Customer Portal</span>
-              <div className="flex items-center space-x-2">
-                <div className="relative w-8 h-4 bg-muted rounded-sm border border-border/50">
-                  <div className="absolute inset-0.5 w-6 bg-gradient-to-r from-accent-foreground to-primary rounded-sm"></div>
-                  <div className="absolute -right-0.5 top-1 w-1 h-2 bg-border rounded-sm"></div>
-                </div>
-                <span className="text-xs font-medium text-foreground">85%</span>
-              </div>
-            </div>
-          )}
-          
           {/* Navigation Tabs for Customer */}
           {userRole === 'customer' ? (
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
@@ -253,9 +239,9 @@ export const Dashboard = () => {
         <div className="absolute bottom-2 right-32 w-12 h-12 bg-primary-glow/10 rounded-full blur-xl"></div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 p-6">
-        <div className="max-w-7xl mx-auto">
+      {/* Main Content - Single Scroller */}
+      <main className="w-full">
+        <div className="w-full px-8 py-6">
           {renderDashboard()}
         </div>
       </main>
