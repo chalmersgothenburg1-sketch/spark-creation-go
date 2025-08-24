@@ -65,35 +65,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       </SidebarHeader>
 
       <SidebarContent className="px-2">
-        {/* Dashboard Navigation (Customer Only) - Mobile Sidebar */}
-        {userRole === 'customer' && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {dashboardNavItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <SidebarMenuItem key={item.id}>
-                      <SidebarMenuButton
-                        onClick={() => setActiveTab(item.id)}
-                        className={`transition-all duration-200 ${
-                          isActive
-                            ? 'bg-gradient-to-r from-primary/20 to-primary-glow/20 text-primary border border-primary/20 shadow-soft'
-                            : 'hover:bg-accent/20'
-                        }`}
-                      >
-                        <Icon className={`h-4 w-4 ${isActive ? 'text-primary' : ''}`} />
-                        {!isCollapsed && <span>{item.label}</span>}
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+        {/* Empty sidebar content - only used for trigger */}
       </SidebarContent>
     </Sidebar>
   );

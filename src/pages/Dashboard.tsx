@@ -194,7 +194,7 @@ export const Dashboard = () => {
             </div>
           </header>
 
-          {/* Desktop Tabs for Customer Dashboard */}
+          {/* Dashboard Tabs for All Screen Sizes */}
           {userRole === 'customer' && (
             <DashboardTabs
               activeTab={activeTab}
