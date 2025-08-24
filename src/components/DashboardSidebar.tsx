@@ -1,28 +1,57 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import React from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
+} from '@/components/ui/sidebar';
 import { 
+  Heart, 
   Activity, 
+  Shield, 
+  MessageCircle, 
+  Phone, 
   AlertTriangle, 
   FileText, 
-  Shield, 
   Settings,
-  LogOut
-} from "lucide-react";
-import { CustomerDashboard } from "@/components/dashboards/CustomerDashboard";
-import { EmergencyDashboard } from "@/components/dashboards/EmergencyDashboard";
-import { PrescriptionDashboard } from "@/components/dashboards/PrescriptionDashboard";
-import { InsuranceDashboard } from "@/components/dashboards/InsuranceDashboard";
-import { SettingsDashboard } from "@/components/dashboards/SettingsDashboard";
+  Home
+} from 'lucide-react';
 
 interface DashboardSidebarProps {
-  onSignOut: () => void;
+  userRole: string;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  onNavigate: (path: string) => void;
 }
 
-export const DashboardSidebar = ({ onSignOut }: DashboardSidebarProps) => {
-  const [activeTab, setActiveTab] = useState("dashboard");
+export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
+  userRole,
+  activeTab,
+  setActiveTab,
+  onNavigate,
+}) => {
+  const { state } = useSidebar();
+  const isCollapsed = state === 'collapsed';
 
-  const menuItems = [
+  // Main navigation items for all users
+  const mainNavItems = [
+    { id: "home", label: "Home", icon: Home, path: "/" },
+    { id: "features", label: "Features", icon: Activity, path: "/#features" },
+    { id: "plans", label: "Plans", icon: Shield, path: "/#plans" },
+    { id: "why-us", label: "Why Us", icon: MessageCircle, path: "/#why-us" },
+    { id: "faqs", label: "FAQs", icon: Phone, path: "/#faqs" },
+  ];
+
+  // Dashboard navigation items (only for customers)
+  const dashboardNavItems = [
     { id: "dashboard", label: "Dashboard", icon: Activity },
     { id: "emergency", label: "Emergency", icon: AlertTriangle },
     { id: "prescriptions", label: "Prescriptions", icon: FileText },
@@ -30,69 +59,75 @@ export const DashboardSidebar = ({ onSignOut }: DashboardSidebarProps) => {
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
-  const renderDashboardContent = () => {
-    switch (activeTab) {
-      case "dashboard":
-        return <CustomerDashboard />;
-      case "emergency":
-        return <EmergencyDashboard />;
-      case "prescriptions":
-        return <PrescriptionDashboard />;
-      case "insurance":
-        return <InsuranceDashboard />;
-      case "settings":
-        return <SettingsDashboard />;
-      default:
-        return <CustomerDashboard />;
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <div className="w-80 bg-card border-r border-border h-screen flex flex-col">
-        <div className="p-6">
-          <h2 className="text-xl font-bold text-foreground mb-6">Health Monitor</h2>
-          
-          <nav className="space-y-2">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Button
-                  key={item.id}
-                  variant={activeTab === item.id ? "default" : "ghost"}
-                  className="w-full justify-start"
-                  onClick={() => setActiveTab(item.id)}
-                >
-                  <Icon className="h-4 w-4 mr-3" />
-                  {item.label}
-                </Button>
-              );
-            })}
-          </nav>
-        </div>
-
-        <div className="mt-auto p-6 border-t border-border space-y-4">
-          <div className="flex justify-center">
-            <ThemeToggle />
+    <Sidebar className="border-r border-border/20 bg-card/50 backdrop-blur-sm">
+      <SidebarHeader className="border-b border-border/20 p-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-glow rounded-lg flex items-center justify-center shadow-soft">
+            <Heart className="h-5 w-5 text-white" />
           </div>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={onSignOut}
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+          {!isCollapsed && (
+            <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+              WeCareWell
+            </h1>
+          )}
         </div>
-      </div>
+      </SidebarHeader>
 
-      {/* Main Content */}
-      <main className="flex-1 p-6">
-        <div className="max-w-7xl mx-auto">
-          {renderDashboardContent()}
-        </div>
-      </main>
-    </div>
+      <SidebarContent className="px-2">
+        {/* Main Navigation */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {mainNavItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      onClick={() => onNavigate(item.path)}
+                      className="hover:bg-accent/20 transition-colors"
+                    >
+                      <Icon className="h-4 w-4" />
+                      {!isCollapsed && <span>{item.label}</span>}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Dashboard Navigation (Customer Only) */}
+        {userRole === 'customer' && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {dashboardNavItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton
+                        onClick={() => setActiveTab(item.id)}
+                        className={`transition-all duration-200 ${
+                          isActive
+                            ? 'bg-gradient-to-r from-primary/20 to-primary-glow/20 text-primary border border-primary/20 shadow-soft'
+                            : 'hover:bg-accent/20'
+                        }`}
+                      >
+                        <Icon className={`h-4 w-4 ${isActive ? 'text-primary' : ''}`} />
+                        {!isCollapsed && <span>{item.label}</span>}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+      </SidebarContent>
+    </Sidebar>
   );
 };

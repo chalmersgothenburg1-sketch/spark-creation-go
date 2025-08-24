@@ -11,19 +11,15 @@ import { PrescriptionDashboard } from "@/components/dashboards/PrescriptionDashb
 import { InsuranceDashboard } from "@/components/dashboards/InsuranceDashboard";
 import { SettingsDashboard } from "@/components/dashboards/SettingsDashboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
+import { UserProfileDropdown } from "@/components/UserProfileDropdown";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { ChatBox } from "@/components/ChatBox";
 import { 
-  Heart, 
-  Activity, 
-  Shield, 
-  MessageCircle, 
-  Phone, 
-  AlertTriangle, 
-  FileText, 
-  Settings,
-  LogOut
-} from "lucide-react";
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { Heart } from "lucide-react";
 import { toast } from "sonner";
 
 export const Dashboard = () => {
@@ -49,24 +45,6 @@ export const Dashboard = () => {
   };
 
   const userRole = user?.email ? getUserRole(user.email) : 'customer';
-
-  // Navigation items for main pages
-  const mainNavItems = [
-    { id: "home", label: "Home", icon: Heart, action: () => navigate("/") },
-    { id: "features", label: "Features", icon: Activity, action: () => navigate("/") },
-    { id: "plans", label: "Plans", icon: Shield, action: () => navigate("/") },
-    { id: "why-us", label: "Why Us", icon: MessageCircle, action: () => navigate("/") },
-    { id: "faqs", label: "FAQs", icon: Phone, action: () => navigate("/") },
-  ];
-
-  // Dashboard navigation items (only for customers)
-  const dashboardNavItems = [
-    { id: "dashboard", label: "Dashboard", icon: Activity },
-    { id: "emergency", label: "Emergency", icon: AlertTriangle },
-    { id: "prescriptions", label: "Prescriptions", icon: FileText },
-    { id: "insurance", label: "Insurance", icon: Shield },
-    { id: "settings", label: "Settings", icon: Settings },
-  ];
 
   useEffect(() => {
     // Set up auth state listener
@@ -103,6 +81,28 @@ export const Dashboard = () => {
       navigate("/");
     } catch (error) {
       toast.error("Error signing out");
+    }
+  };
+
+  const handleNavigate = (path: string) => {
+    if (path.startsWith("/#")) {
+      navigate("/");
+      // Scroll to section after navigation
+      setTimeout(() => {
+        const sectionId = path.substring(2);
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      navigate(path);
+    }
+  };
+
+  const handleSettings = () => {
+    if (userRole === 'customer') {
+      setActiveTab('settings');
     }
   };
 
@@ -150,101 +150,60 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Enhanced Warm Header */}
-      <header className="relative h-20 flex items-center justify-between border-b border-border/20 bg-gradient-to-r from-primary/5 via-primary-glow/3 to-accent/5 backdrop-blur-md sticky top-0 z-40 px-8 shadow-soft">
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-card/80 via-card/60 to-card/80 backdrop-blur-sm"></div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <DashboardSidebar
+          userRole={userRole}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onNavigate={handleNavigate}
+        />
         
-        <div className="relative flex items-center space-x-8">
-          {/* Logo Section */}
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-glow rounded-xl flex items-center justify-center shadow-soft">
-              <Heart className="h-6 w-6 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-              WeCareWell
-            </h1>
-          </div>
-          
-          {/* Navigation Tabs for Customer */}
-          {userRole === 'customer' ? (
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-              <TabsList className="grid grid-cols-5 w-full max-w-2xl bg-card/40 backdrop-blur-sm border border-border/30 shadow-soft h-12">
-                {dashboardNavItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <TabsTrigger 
-                      key={item.id} 
-                      value={item.id} 
-                      className={`
-                        relative flex items-center justify-center space-x-2 text-sm font-medium transition-all duration-300 rounded-lg
-                        ${isActive 
-                          ? 'bg-gradient-to-r from-primary/20 to-primary-glow/20 text-primary shadow-soft border border-primary/20' 
-                          : 'text-muted-foreground hover:text-foreground hover:bg-accent/20'
-                        }
-                      `}
-                    >
-                      <Icon className={`h-4 w-4 ${isActive ? 'text-primary' : ''}`} />
-                      <span className="hidden sm:inline">{item.label}</span>
-                      {isActive && (
-                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-gradient-to-r from-primary to-primary-glow rounded-full"></div>
-                      )}
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-            </Tabs>
-          ) : (
-            <div className="flex items-center space-x-8">
-              {mainNavItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={item.action}
-                    className="group flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative"
-                  >
-                    <Icon className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
-                    <span>{item.label}</span>
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-primary-glow group-hover:w-full transition-all duration-300"></span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
+        <SidebarInset className="flex-1">
+          {/* Enhanced Responsive Header */}
+          <header className="sticky top-0 z-40 border-b border-border/20 bg-gradient-to-r from-primary/5 via-primary-glow/3 to-accent/5 backdrop-blur-md">
+            <div className="flex h-16 items-center justify-between px-4 md:px-6">
+              {/* Left: Sidebar trigger and logo */}
+              <div className="flex items-center space-x-4">
+                <SidebarTrigger className="md:hidden" />
+                <div className="flex items-center space-x-3 md:hidden">
+                  <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-glow rounded-lg flex items-center justify-center shadow-soft">
+                    <Heart className="h-5 w-5 text-white" />
+                  </div>
+                  <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+                    WeCareWell
+                  </h1>
+                </div>
+                <SidebarTrigger className="hidden md:flex" />
+              </div>
 
-        {/* Right Side Actions */}
-        <div className="relative flex items-center space-x-4">
-          <div className="flex items-center space-x-3 px-4 py-2 bg-card/60 backdrop-blur-sm rounded-2xl border border-border/30 shadow-soft">
-            <span className="text-sm text-muted-foreground">Welcome,</span>
-            <span className="text-sm font-semibold text-foreground">{user.email?.split('@')[0]}</span>
-          </div>
-          <ThemeToggle />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSignOut}
-            className="flex items-center space-x-2 bg-card/60 backdrop-blur-sm border-border/30 hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all duration-300 shadow-soft"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Sign Out</span>
-          </Button>
-        </div>
-        
-        {/* Decorative Elements */}
-        <div className="absolute top-2 left-20 w-16 h-16 bg-primary/5 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-2 right-32 w-12 h-12 bg-primary-glow/10 rounded-full blur-xl"></div>
-      </header>
+              {/* Right: User actions */}
+              <div className="flex items-center space-x-3">
+                <div className="hidden sm:flex items-center space-x-3 px-3 py-2 bg-card/60 backdrop-blur-sm rounded-xl border border-border/30 shadow-soft">
+                  <span className="text-sm text-muted-foreground">Welcome,</span>
+                  <span className="text-sm font-semibold text-foreground">{user.email?.split('@')[0]}</span>
+                </div>
+                <ThemeToggle />
+                <UserProfileDropdown
+                  user={user}
+                  onSignOut={handleSignOut}
+                  onSettings={handleSettings}
+                />
+              </div>
+            </div>
+          </header>
 
-      {/* Main Content - Single Scroller */}
-      <main className="w-full">
-        <div className="w-full px-8 py-6">
-          {renderDashboard()}
-        </div>
-      </main>
-    </div>
+          {/* Main Content */}
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto p-4 md:p-6 space-y-6">
+              {renderDashboard()}
+            </div>
+          </main>
+        </SidebarInset>
+
+        {/* AI Assistant Chatbox */}
+        <ChatBox showWelcomeMessage={true} />
+      </div>
+    </SidebarProvider>
   );
 };

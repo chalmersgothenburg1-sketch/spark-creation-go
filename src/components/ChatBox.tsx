@@ -14,8 +14,13 @@ interface Message {
   timestamp: Date;
 }
 
-export const ChatBox: React.FC = () => {
-  const [isMinimized, setIsMinimized] = useState(false);
+interface ChatBoxProps {
+  showWelcomeMessage?: boolean;
+}
+
+export const ChatBox: React.FC<ChatBoxProps> = ({ showWelcomeMessage = false }) => {
+  const [isMinimized, setIsMinimized] = useState(true); // Default to minimized
+  const [hasShownWelcome, setHasShownWelcome] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -28,6 +33,18 @@ export const ChatBox: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Show welcome message when dashboard loads
+  React.useEffect(() => {
+    if (showWelcomeMessage && !hasShownWelcome) {
+      setHasShownWelcome(true);
+      toast({
+        title: "AI Assistant Available",
+        description: "Your health assistant is ready to help! Click the bot icon in the bottom right corner.",
+        duration: 4000,
+      });
+    }
+  }, [showWelcomeMessage, hasShownWelcome, toast]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -92,10 +109,16 @@ export const ChatBox: React.FC = () => {
       <div className="fixed bottom-4 right-4 z-50">
         <Button
           onClick={() => setIsMinimized(false)}
-          className="bg-primary hover:bg-primary/90 text-white rounded-full w-12 h-12 shadow-lg"
+          className="bg-gradient-to-br from-primary to-primary-glow hover:from-primary/90 hover:to-primary-glow/90 text-white rounded-full w-14 h-14 shadow-xl border-2 border-white/20 animate-pulse hover:animate-none transition-all duration-300 hover:scale-105"
         >
           <Bot className="h-6 w-6" />
         </Button>
+        {showWelcomeMessage && (
+          <div className="absolute bottom-16 right-0 bg-card/95 backdrop-blur-md border border-border/50 rounded-lg p-3 shadow-xl max-w-64 animate-fade-in">
+            <p className="text-sm text-foreground font-medium">AI Assistant Ready!</p>
+            <p className="text-xs text-muted-foreground mt-1">Click to chat about your health</p>
+          </div>
+        )}
       </div>
     );
   }
