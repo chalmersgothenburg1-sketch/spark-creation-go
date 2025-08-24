@@ -41,22 +41,12 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
 
-  // Main navigation items for all users
-  const mainNavItems = [
-    { id: "home", label: "Home", icon: Home, path: "/" },
-    { id: "features", label: "Features", icon: Activity, path: "/#features" },
-    { id: "plans", label: "Plans", icon: Shield, path: "/#plans" },
-    { id: "why-us", label: "Why Us", icon: MessageCircle, path: "/#why-us" },
-    { id: "faqs", label: "FAQs", icon: Phone, path: "/#faqs" },
-  ];
-
   // Dashboard navigation items (only for customers)
   const dashboardNavItems = [
     { id: "dashboard", label: "Dashboard", icon: Activity },
     { id: "emergency", label: "Emergency", icon: AlertTriangle },
     { id: "prescriptions", label: "Prescriptions", icon: FileText },
     { id: "insurance", label: "Insurance", icon: Shield },
-    { id: "settings", label: "Settings", icon: Settings },
   ];
 
   return (
@@ -75,30 +65,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       </SidebarHeader>
 
       <SidebarContent className="px-2">
-        {/* Main Navigation */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainNavItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      onClick={() => onNavigate(item.path)}
-                      className="hover:bg-accent/20 transition-colors"
-                    >
-                      <Icon className="h-4 w-4" />
-                      {!isCollapsed && <span>{item.label}</span>}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Dashboard Navigation (Customer Only) */}
+        {/* Dashboard Navigation (Customer Only) - Mobile Sidebar */}
         {userRole === 'customer' && (
           <SidebarGroup>
             <SidebarGroupLabel>Dashboard</SidebarGroupLabel>

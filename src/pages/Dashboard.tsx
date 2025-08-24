@@ -13,6 +13,7 @@ import { SettingsDashboard } from "@/components/dashboards/SettingsDashboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { UserProfileDropdown } from "@/components/UserProfileDropdown";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { DashboardTabs } from "@/components/DashboardTabs";
 import { ChatBox } from "@/components/ChatBox";
 import { 
   SidebarProvider,
@@ -192,6 +193,14 @@ export const Dashboard = () => {
               </div>
             </div>
           </header>
+
+          {/* Desktop Tabs for Customer Dashboard */}
+          {userRole === 'customer' && (
+            <DashboardTabs
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+          )}
 
           {/* Main Content */}
           <main className="flex-1 overflow-auto">
