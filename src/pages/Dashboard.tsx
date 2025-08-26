@@ -201,6 +201,17 @@ export const Dashboard = () => {
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
+          {/* Battery Percentage like mobile phone */}
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <div className="w-6 h-3 border border-muted-foreground rounded-sm relative">
+                <div className="absolute inset-0.5 bg-green-500 rounded-sm" style={{ width: '78%' }}></div>
+                <div className="absolute -right-0.5 top-1/2 -translate-y-1/2 w-0.5 h-1.5 bg-muted-foreground rounded-r-sm"></div>
+              </div>
+              <span className="text-xs font-medium">78%</span>
+            </div>
+          </div>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center space-x-2">
