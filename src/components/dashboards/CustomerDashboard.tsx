@@ -18,6 +18,7 @@ import { SpO2DetailModal } from "@/components/SpO2DetailModal";
 import { BloodPressureDetailModal } from "@/components/BloodPressureDetailModal";
 import { SleepTrackingCard } from "@/components/SleepTrackingCard";
 import { MapCard } from "@/components/MapCard";
+import ActivityCard from "@/components/ActivityCard";
 
 const healthData = [
   { time: "6:00", heartRate: 68, bloodPressure: 120, steps: 0 },
@@ -272,39 +273,9 @@ export const CustomerDashboard = () => {
         <MapCard className="lg:col-span-1" />
       </div>
 
-     {/* Health Charts */}
+     {/* Enhanced Activity Card */}
       <div className="grid grid-cols-1 gap-4">
-        <Card className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-          <h3 className="text-lg font-semibold mb-4 text-blue-700">Daily Activity</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={healthData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="time" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'white',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                }}
-              />
-              <Area 
-                type="monotone" 
-                dataKey="steps" 
-                stroke="#2563eb" 
-                fill="url(#blueGradient)"
-                strokeWidth={2}
-              />
-              <defs>
-                <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                </linearGradient>
-              </defs>
-            </AreaChart>
-          </ResponsiveContainer>
-        </Card>
+        <ActivityCard />
       </div>
 
       
