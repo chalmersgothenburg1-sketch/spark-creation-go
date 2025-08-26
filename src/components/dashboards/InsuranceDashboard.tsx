@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Upload, Shield, Calendar, Download, CheckCircle } from "lucide-react";
 import { InsuranceUpload } from "@/components/InsuranceUpload";
+import { ChatBox } from "@/components/ChatBox";
 
 const insuranceDocuments = [
   {
@@ -230,6 +231,10 @@ export const InsuranceDashboard = () => {
           </div>
         </div>
       </Card>
+      
+      {/* AI Chatbox */}
+      <ChatBox />
+    
     </div>
   );
 };

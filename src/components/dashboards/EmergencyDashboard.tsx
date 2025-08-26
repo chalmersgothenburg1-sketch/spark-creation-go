@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Phone, MapPin, Clock, Users } from "lucide-react";
+import { ChatBox } from "@/components/ChatBox";
 
 export const EmergencyDashboard = () => {
   return (
@@ -136,6 +137,9 @@ export const EmergencyDashboard = () => {
           </div>
         </div>
       </Card>
+
+      {/* AI Chatbox */}
+      <ChatBox />
     </div>
   );
 };

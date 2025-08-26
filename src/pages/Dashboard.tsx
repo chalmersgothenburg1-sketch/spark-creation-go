@@ -1,3 +1,4 @@
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -22,8 +23,17 @@ import {
   AlertTriangle, 
   FileText, 
   Settings,
-  LogOut
+  LogOut,
+  User as UserIcon,
+  ChevronDown
 } from "lucide-react";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
 export const Dashboard = () => {
@@ -31,6 +41,7 @@ export const Dashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   // Determine user role based on email domain
@@ -48,7 +59,13 @@ export const Dashboard = () => {
     }
   };
 
+  // Extract username from email
+  const getUsername = (email: string) => {
+    return email.split('@')[0];
+  };
+
   const userRole = user?.email ? getUserRole(user.email) : 'customer';
+  const username = user?.email ? getUsername(user.email) : 'User';
 
   // Navigation items for main pages
   const mainNavItems = [
@@ -59,13 +76,12 @@ export const Dashboard = () => {
     { id: "faqs", label: "FAQs", icon: Phone, action: () => navigate("/") },
   ];
 
-  // Dashboard navigation items (only for customers)
+  // Dashboard navigation items (only for customers) - removed settings
   const dashboardNavItems = [
     { id: "dashboard", label: "Dashboard", icon: Activity },
     { id: "emergency", label: "Emergency", icon: AlertTriangle },
     { id: "prescriptions", label: "Prescriptions", icon: FileText },
     { id: "insurance", label: "Insurance", icon: Shield },
-    { id: "settings", label: "Settings", icon: Settings },
   ];
 
   useEffect(() => {
@@ -151,97 +167,136 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Enhanced Warm Header */}
-      <header className="relative h-20 flex items-center justify-between border-b border-border/20 bg-gradient-to-r from-primary/5 via-primary-glow/3 to-accent/5 backdrop-blur-md sticky top-0 z-40 px-8 shadow-soft">
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-card/80 via-card/60 to-card/80 backdrop-blur-sm"></div>
-        
-        <div className="relative flex items-center space-x-8">
-          {/* Logo Section */}
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-glow rounded-xl flex items-center justify-center shadow-soft">
-              <Heart className="h-6 w-6 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-              WeCareWell
-            </h1>
-          </div>
+      {/* Header with Navigation Tabs */}
+      <header className="h-16 flex items-center justify-between border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 px-6">
+        <div className="flex items-center">
+          <h1 className="text-xl font-semibold text-foreground mr-8">WeCareWell</h1>
           
-          {/* Navigation Tabs for Customer */}
-          {userRole === 'customer' ? (
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-              <TabsList className="grid grid-cols-5 w-full max-w-2xl bg-card/40 backdrop-blur-sm border border-border/30 shadow-soft h-12">
-                {dashboardNavItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <TabsTrigger 
-                      key={item.id} 
-                      value={item.id} 
-                      className={`
-                        relative flex items-center justify-center space-x-2 text-sm font-medium transition-all duration-300 rounded-lg
-                        ${isActive 
-                          ? 'bg-gradient-to-r from-primary/20 to-primary-glow/20 text-primary shadow-soft border border-primary/20' 
-                          : 'text-muted-foreground hover:text-foreground hover:bg-accent/20'
-                        }
-                      `}
-                    >
-                      <Icon className={`h-4 w-4 ${isActive ? 'text-primary' : ''}`} />
-                      <span className="hidden sm:inline">{item.label}</span>
-                      {isActive && (
-                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-gradient-to-r from-primary to-primary-glow rounded-full"></div>
-                      )}
+          <div className="hidden md:flex">
+            {userRole === 'customer' ? (
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
+                <TabsList className="grid grid-cols-4 w-full max-w-md">
+                  {dashboardNavItems.map((item) => (
+                    <TabsTrigger key={item.id} value={item.id} className="text-xs">
+                      {item.label}
                     </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-            </Tabs>
-          ) : (
-            <div className="flex items-center space-x-8">
-              {mainNavItems.map((item) => {
-                const Icon = item.icon;
-                return (
+                  ))}
+                </TabsList>
+              </Tabs>
+            ) : (
+              <div className="flex items-center space-x-6">
+                {mainNavItems.map((item) => (
                   <button
                     key={item.id}
                     onClick={item.action}
-                    className="group flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative"
+                    className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    <Icon className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
-                    <span>{item.label}</span>
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-primary-glow group-hover:w-full transition-all duration-300"></span>
+                    <item.icon className="h-4 w-4 mr-2" />
+                    {item.label}
                   </button>
-                );
-              })}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Right Side Actions */}
-        <div className="relative flex items-center space-x-4">
-          <div className="flex items-center space-x-3 px-4 py-2 bg-card/60 backdrop-blur-sm rounded-2xl border border-border/30 shadow-soft">
-            <span className="text-sm text-muted-foreground">Welcome,</span>
-            <span className="text-sm font-semibold text-foreground">{user.email?.split('@')[0]}</span>
-          </div>
-          <ThemeToggle />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSignOut}
-            className="flex items-center space-x-2 bg-card/60 backdrop-blur-sm border-border/30 hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all duration-300 shadow-soft"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Sign Out</span>
-          </Button>
+        <div className="hidden md:flex items-center space-x-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center space-x-2">
+                <UserIcon className="h-4 w-4" />
+                <span className="text-sm">{username}</span>
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => setActiveTab("settings")}>
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        
-        {/* Decorative Elements */}
-        <div className="absolute top-2 left-20 w-16 h-16 bg-primary/5 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-2 right-32 w-12 h-12 bg-primary-glow/10 rounded-full blur-xl"></div>
+        {/* Mobile Hamburger */}
+        <button
+          className="md:hidden text-foreground"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </header>
 
-      {/* Main Content - Single Scroller */}
-      <main className="w-full">
-        <div className="w-full px-8 py-6">
+      {/* Mobile Dropdown Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-card border-b border-border shadow-lg p-4 space-y-4">
+          <span className="block text-sm text-muted-foreground">Welcome, {username}</span>
+
+          {userRole === 'customer' ? (
+            <div className="flex flex-col space-y-2">
+              {dashboardNavItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    setIsMenuOpen(false);
+                  }}
+                  className="text-left text-muted-foreground hover:text-foreground"
+                >
+                  {item.label}
+                </button>
+              ))}
+              <button
+                onClick={() => {
+                  setActiveTab("settings");
+                  setIsMenuOpen(false);
+                }}
+                className="text-left text-muted-foreground hover:text-foreground"
+              >
+                Settings
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col space-y-2">
+              {mainNavItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    item.action();
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center text-muted-foreground hover:text-foreground"
+                >
+                  <item.icon className="h-4 w-4 mr-2" />
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Mobile Footer Actions */}
+          <div className="flex items-center justify-between pt-4 border-t">
+            {/* <ThemeToggle /> */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSignOut}
+              className="flex items-center"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <main className="flex-1 p-6">
+        <div className="max-w-7xl mx-auto">
           {renderDashboard()}
         </div>
       </main>

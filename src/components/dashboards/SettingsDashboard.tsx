@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { 
   User, 
   Phone, 
@@ -55,7 +56,10 @@ export const SettingsDashboard = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">Account Settings</h2>
-        <Badge variant="secondary">Settings Portal</Badge>
+        <div className="flex items-center space-x-3">
+          <Badge variant="secondary">Settings Portal</Badge>
+          <ThemeToggle /> {/* 👈 Theme toggle now lives in settings */}
+        </div>
       </div>
 
       {/* Profile Information */}

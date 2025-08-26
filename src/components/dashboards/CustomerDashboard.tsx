@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { Heart, Activity, Battery, Shield, Phone, Upload, FileText, Flame, Clock, Brain, BarChart3 } from "lucide-react";
+import { Heart, Activity, Battery, Shield, Phone, Upload, FileText, Flame, Clock, Brain, BarChart3, Zap, Gauge } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { EmergencyMonitor } from "@/components/EmergencyMonitor";
@@ -73,6 +73,8 @@ export const CustomerDashboard = () => {
   const [showStepsModal, setShowStepsModal] = useState(false);
   const [showHeartRateModal, setShowHeartRateModal] = useState(false);
   const [showCaloriesModal, setShowCaloriesModal] = useState(false);
+  const [showBloodPressureModal, setShowBloodPressureModal] = useState(false);
+  const [showSpO2Modal, setShowSpO2Modal] = useState(false);
 
   const handleReportSubmit = () => {
     if (!reportRequest.trim()) {
@@ -93,16 +95,17 @@ export const CustomerDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">My Health Dashboard</h1>
+        <h1 className="text-2xl font-bold text-foreground">My Health Dashboard</h1>
+        <Badge variant="secondary">Customer Portal</Badge>
       </div>
 
       {/* Emergency Monitor - Always at top for customers */}
       <EmergencyMonitor />
 
       {/* Health Status Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
         <Card className="group relative overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 border-red-200 hover:shadow-lg transition-all duration-300">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
@@ -147,6 +150,50 @@ export const CustomerDashboard = () => {
           <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-indigo-400"></div>
         </Card>
 
+        <Card className="group relative overflow-hidden bg-gradient-to-br from-orange-50 to-amber-100 border-orange-200 hover:shadow-lg transition-all duration-300">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <Gauge className="h-10 w-10 text-orange-600" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowBloodPressureModal(true)}
+                className="h-8 w-8 p-0 hover:bg-orange-100 text-orange-600"
+              >
+                <BarChart3 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div>
+              <p className="text-sm text-orange-600/70 font-medium">Blood Pressure</p>
+              <p className="text-3xl font-bold text-orange-700 mb-1">120/80</p>
+              <p className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full inline-block">Normal</p>
+            </div>
+          </div>
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 to-amber-400"></div>
+        </Card>
+
+        <Card className="group relative overflow-hidden bg-gradient-to-br from-cyan-50 to-sky-100 border-cyan-200 hover:shadow-lg transition-all duration-300">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <Zap className="h-10 w-10 text-cyan-600" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowSpO2Modal(true)}
+                className="h-8 w-8 p-0 hover:bg-cyan-100 text-cyan-600"
+              >
+                <BarChart3 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div>
+              <p className="text-sm text-cyan-600/70 font-medium">SpO2</p>
+              <p className="text-3xl font-bold text-cyan-700 mb-1">98%</p>
+              <p className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full inline-block">Excellent</p>
+            </div>
+          </div>
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-sky-400"></div>
+        </Card>
+
         <Card className="group relative overflow-hidden bg-gradient-to-br from-emerald-50 to-green-100 border-emerald-200 hover:shadow-lg transition-all duration-300">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
@@ -187,57 +234,7 @@ export const CustomerDashboard = () => {
       </div>
 
       {/* Enhanced Health Metrics and Map */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        {/* Intensity Minutes */}
-        <Card className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-          <div className="flex items-center mb-4">
-            <Clock className="h-6 w-6 text-orange-600 mr-3" />
-            <h3 className="text-lg font-semibold text-orange-700">Intensity Minutes</h3>
-          </div>
-          
-          <div className="flex items-center justify-center mb-4">
-            <div className="relative w-32 h-32">
-              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="50"
-                  stroke="#fed7aa"
-                  strokeWidth="8"
-                  fill="none"
-                />
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="50"
-                  stroke="#ea580c"
-                  strokeWidth="8"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeDasharray={`${(110/150) * 314} 314`}
-                  strokeDashoffset="0"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-3xl font-bold text-orange-700">110</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="text-center mb-4">
-            <p className="text-sm text-orange-600">150</p>
-          </div>
-          
-          <div className="flex justify-center space-x-2">
-            {weeklyActivity.map((day, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div className={`w-3 h-3 rounded-full mb-1 ${day.active ? 'bg-orange-600' : 'bg-orange-200'}`}></div>
-                <span className="text-xs text-orange-600">{day.day}</span>
-              </div>
-            ))}
-          </div>
-        </Card>
-
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Calories Burned */}
         <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
           <div className="flex items-center justify-between mb-4">
@@ -283,93 +280,12 @@ export const CustomerDashboard = () => {
           </ResponsiveContainer>
         </Card>
 
-        {/* Stress */}
-        <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <div className="flex items-center mb-4">
-            <Brain className="h-6 w-6 text-blue-600 mr-3" />
-            <h3 className="text-lg font-semibold text-blue-700">Stress</h3>
-          </div>
-          
-          <div className="flex items-center justify-center mb-4">
-            <div className="relative w-32 h-32">
-              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="50"
-                  stroke="#bfdbfe"
-                  strokeWidth="8"
-                  fill="none"
-                />
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="50"
-                  stroke="#2563eb"
-                  strokeWidth="8"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeDasharray={`${(30/100) * 314} 314`}
-                  strokeDashoffset="0"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-3xl font-bold text-blue-700">30</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex justify-between text-xs text-blue-600 mb-2">
-            <span>12 AM</span>
-            <span>12 AM</span>
-          </div>
-          
-          <ResponsiveContainer width="100%" height={60}>
-            <AreaChart data={stressData}>
-              <Area 
-                type="monotone" 
-                dataKey="stress" 
-                stroke="#2563eb" 
-                fill="#3b82f6"
-                fillOpacity={0.3}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </Card>
-
         {/* Map Card */}
         <MapCard className="lg:col-span-1" />
       </div>
 
      {/* Health Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="p-6 bg-gradient-to-br from-red-50 to-pink-50 border-red-200">
-          <h3 className="text-lg font-semibold mb-4 text-red-700">Today's Heart Rate</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={healthData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="time" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'white',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                }}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="heartRate" 
-                stroke="#dc2626" 
-                strokeWidth={3}
-                dot={{ fill: '#dc2626', r: 4 }}
-                activeDot={{ r: 6, fill: '#dc2626' }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </Card>
-
+      <div className="grid grid-cols-1 gap-4">
         <Card className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
           <h3 className="text-lg font-semibold mb-4 text-blue-700">Daily Activity</h3>
           <ResponsiveContainer width="100%" height={300}>

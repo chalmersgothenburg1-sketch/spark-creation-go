@@ -15,7 +15,7 @@ interface Message {
 }
 
 export const ChatBox: React.FC = () => {
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',

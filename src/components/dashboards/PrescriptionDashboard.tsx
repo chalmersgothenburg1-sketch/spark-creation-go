@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Upload, FileText, Calendar, Clock, Download } from "lucide-react";
 import { PrescriptionUpload } from "@/components/PrescriptionUpload";
+import { ChatBox } from "@/components/ChatBox";
 
 const previousPrescriptions = [
   {
@@ -154,6 +155,9 @@ export const PrescriptionDashboard = () => {
           </div>
         </div>
       </Card>
+
+      {/* AI Chatbox */}
+      <ChatBox />
     </div>
   );
 };

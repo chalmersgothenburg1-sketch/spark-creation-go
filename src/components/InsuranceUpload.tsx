@@ -52,9 +52,30 @@ export const InsuranceUpload = () => {
     setLoading(true);
 
     try {
-      // Simulate upload delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      let fileUrl = null;
+      const file = fileInputRef.current?.files?.[0];
       
+      if (file) {
+        fileUrl = await uploadFile(file);
+        if (!fileUrl) {
+          throw new Error("Failed to upload file");
+        }
+      }
+
+      const { error } = await (supabase as any)
+        .from('insurance_details')
+        .insert({
+          user_id: user.id,
+          ...formData,
+          file_url: fileUrl,
+          expiry_date: formData.expiry_date || null
+        });
+
+      if (error) throw error;
+
       toast.success("Insurance details added successfully");
       setFormData({
         provider_name: "",
