@@ -44,9 +44,9 @@ const sleepData = generateSleepData();
 
 const getBarColor = (stage: string) => {
   switch (stage) {
-    case "deep": return "#1e3a8a"; // Deep blue for deep sleep
-    case "light": return "#3b82f6"; // Medium blue for light sleep  
-    case "awake": return "#f8fafc"; // Light gray for awake
+    case "deep": return "#6366f1"; // Indigo for deep sleep
+    case "light": return "#8b5cf6"; // Purple for light sleep  
+    case "awake": return "#e2e8f0"; // Light gray for awake
     default: return "#e5e7eb";
   }
 };
@@ -63,29 +63,29 @@ export const SleepTrackingCard = () => {
   const wakeTime = sleepData[sleepData.length - 1]?.time || "7:15 AM";
   
   return (
-    <Card className="group relative overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700 hover:shadow-xl transition-all duration-300">
+    <Card className="group relative overflow-hidden bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200 hover:shadow-lg transition-all duration-300 animate-fade-in">
       <div className="p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-bold text-white mb-1">Time asleep</h3>
+            <h3 className="text-xl font-bold text-purple-700 mb-1">Time asleep</h3>
             <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-light text-white">{totalHours}</span>
-              <span className="text-lg text-slate-300">h</span>
-              <span className="text-4xl font-light text-white ml-2">{totalMinutes}</span>
-              <span className="text-lg text-slate-300">min</span>
+              <span className="text-4xl font-light text-purple-700">{totalHours}</span>
+              <span className="text-lg text-purple-600">h</span>
+              <span className="text-4xl font-light text-purple-700 ml-2">{totalMinutes}</span>
+              <span className="text-lg text-purple-600">min</span>
             </div>
-            <p className="text-sm text-slate-400 mt-2">
+            <p className="text-sm text-purple-600/70 mt-2">
               Total duration {Math.floor(sleepData.length * 0.25)}h {Math.round(((sleepData.length * 0.25) % 1) * 60)}min
             </p>
           </div>
-          <div className="text-slate-400">
+          <div className="text-purple-600">
             <Moon className="h-8 w-8" />
           </div>
         </div>
 
         {/* Sleep Pattern Chart */}
-        <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-600/50 mb-6">
+        <div className="bg-white/60 p-4 rounded-lg border border-purple-200/50 mb-6">
           <ResponsiveContainer width="100%" height={120}>
             <BarChart
               data={sleepData}
@@ -95,7 +95,7 @@ export const SleepTrackingCard = () => {
                 dataKey="displayTime"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 11, fill: '#94a3b8' }}
+                tick={{ fontSize: 11, fill: '#7c3aed' }}
                 interval={0}
               />
               <YAxis hide />
@@ -117,46 +117,46 @@ export const SleepTrackingCard = () => {
 
         {/* Sleep Stats */}
         <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="text-center">
-            <p className="text-lg font-semibold text-white">{Math.floor(deepSleep)}h {Math.round((deepSleep % 1) * 60)}m</p>
-            <p className="text-xs text-slate-400">Deep Sleep</p>
+          <div className="text-center p-3 bg-white/60 rounded-lg border border-purple-200/50">
+            <p className="text-lg font-semibold text-purple-700">{Math.floor(deepSleep)}h {Math.round((deepSleep % 1) * 60)}m</p>
+            <p className="text-xs text-purple-600">Deep Sleep</p>
           </div>
-          <div className="text-center">
-            <p className="text-lg font-semibold text-white">{Math.floor(lightSleep)}h {Math.round((lightSleep % 1) * 60)}m</p>
-            <p className="text-xs text-slate-400">Light Sleep</p>
+          <div className="text-center p-3 bg-white/60 rounded-lg border border-purple-200/50">
+            <p className="text-lg font-semibold text-purple-700">{Math.floor(lightSleep)}h {Math.round((lightSleep % 1) * 60)}m</p>
+            <p className="text-xs text-purple-600">Light Sleep</p>
           </div>
-          <div className="text-center">
-            <p className="text-lg font-semibold text-white">{bedTime} - {wakeTime}</p>
-            <p className="text-xs text-slate-400">Sleep Window</p>
+          <div className="text-center p-3 bg-white/60 rounded-lg border border-purple-200/50">
+            <p className="text-lg font-semibold text-purple-700">{bedTime} - {wakeTime}</p>
+            <p className="text-xs text-purple-600">Sleep Window</p>
           </div>
         </div>
 
         {/* Legend */}
         <div className="flex justify-center gap-6 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-blue-800"></div>
-            <span className="text-slate-300">Deep Sleep</span>
+            <div className="w-3 h-3 rounded bg-indigo-500"></div>
+            <span className="text-purple-600">Deep Sleep</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-blue-500"></div>
-            <span className="text-slate-300">Light Sleep</span>
+            <div className="w-3 h-3 rounded bg-purple-500"></div>
+            <span className="text-purple-600">Light Sleep</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-slate-200"></div>
-            <span className="text-slate-300">Awake</span>
+            <div className="w-3 h-3 rounded bg-gray-300"></div>
+            <span className="text-purple-600">Awake</span>
           </div>
         </div>
 
         {/* Sleep Score */}
         <div className="mt-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-emerald-900/30 px-3 py-1 rounded-full border border-emerald-500/30">
-            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-emerald-300">Excellent Sleep Quality (92%)</span>
+          <div className="inline-flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full border border-green-200">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-sm font-medium text-green-700">Excellent Sleep Quality (92%)</span>
           </div>
         </div>
       </div>
       
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-400 to-indigo-400"></div>
     </Card>
   );
 };
