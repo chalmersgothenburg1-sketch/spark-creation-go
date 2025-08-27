@@ -16,7 +16,7 @@ interface ActivityCardProps {
 }
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ className }) => {
-  const [selectedPeriod, setSelectedPeriod] = useState<'3d' | '7d' | '30d'>('7d');
+  const [selectedPeriod, setSelectedPeriod] = useState<'1d' | '3d' | '7d' | '30d'>('7d');
 
   // Sample data for different activity levels throughout the day
   const generateActivityData = (days: number): ActivityData[] => {
@@ -60,6 +60,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ className }) => {
 
   const getCurrentData = () => {
     switch (selectedPeriod) {
+      case '1d': return generateActivityData(1);
       case '3d': return generateActivityData(3);
       case '7d': return generateActivityData(7);
       case '30d': return generateActivityData(30);
@@ -95,7 +96,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ className }) => {
   };
 
   // Create timeline data for area chart
-  const timelineData = selectedPeriod === '3d' || selectedPeriod === '7d' 
+  const timelineData = selectedPeriod === '1d' 
+    ? currentData 
+    : selectedPeriod === '3d' || selectedPeriod === '7d' 
     ? currentData.filter((_, index) => index % (selectedPeriod === '3d' ? 2 : 4) === 0)
     : currentData.filter((_, index) => index % 12 === 0);
 
@@ -109,7 +112,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ className }) => {
         
         {/* Period Selector */}
         <div className="flex gap-1 bg-white/50 rounded-lg p-1">
-          {(['3d', '7d', '30d'] as const).map((period) => (
+          {(['1d', '3d', '7d', '30d'] as const).map((period) => (
             <Button
               key={period}
               variant={selectedPeriod === period ? "default" : "ghost"}
@@ -121,7 +124,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ className }) => {
                   : 'text-blue-600 hover:bg-blue-100'
               }`}
             >
-              {period === '3d' ? '3 Days' : period === '7d' ? '7 Days' : '30 Days'}
+              {period === '1d' ? '1 Day' : period === '3d' ? '3 Days' : period === '7d' ? '7 Days' : '30 Days'}
             </Button>
           ))}
         </div>
