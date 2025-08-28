@@ -10,6 +10,7 @@ import { CustomerDashboard } from "@/components/dashboards/CustomerDashboard";
 import { EmergencyDashboard } from "@/components/dashboards/EmergencyDashboard";
 import { PrescriptionDashboard } from "@/components/dashboards/PrescriptionDashboard";
 import { InsuranceDashboard } from "@/components/dashboards/InsuranceDashboard";
+import { ClinicalDiagnosisDashboard } from "@/components/dashboards/ClinicalDiagnosisDashboard";
 import { SettingsDashboard } from "@/components/dashboards/SettingsDashboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -25,7 +26,8 @@ import {
   Settings,
   LogOut,
   User as UserIcon,
-  ChevronDown
+  ChevronDown,
+  Stethoscope
 } from "lucide-react";
 import { 
   DropdownMenu,
@@ -82,6 +84,7 @@ export const Dashboard = () => {
     { id: "emergency", label: "Emergency", icon: AlertTriangle },
     { id: "prescriptions", label: "Prescriptions", icon: FileText },
     { id: "insurance", label: "Insurance", icon: Shield },
+    { id: "diagnosis", label: "Diagnosis", icon: Stethoscope },
   ];
 
   useEffect(() => {
@@ -158,6 +161,8 @@ export const Dashboard = () => {
         return <PrescriptionDashboard />;
       case "insurance":
         return <InsuranceDashboard />;
+      case "diagnosis":
+        return <ClinicalDiagnosisDashboard />;
       case "settings":
         return <SettingsDashboard />;
       default:
@@ -175,7 +180,7 @@ export const Dashboard = () => {
           <div className="hidden md:flex">
             {userRole === 'customer' ? (
               <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-                <TabsList className="grid grid-cols-4 w-full max-w-md">
+                <TabsList className="grid grid-cols-5 w-full max-w-2xl">
                   {dashboardNavItems.map((item) => (
                     <TabsTrigger key={item.id} value={item.id} className="text-xs">
                       {item.label}
