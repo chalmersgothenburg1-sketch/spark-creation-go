@@ -60,10 +60,11 @@ const Index = () => {
           {/* <ThemeToggle /> */}
           <Button
             asChild
-            className="hidden md:flex bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+            className="hidden md:flex relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/90 hover:via-primary/80 hover:to-primary/70 text-white shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 hover:scale-105 rounded-full px-6 py-2.5 font-semibold before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/10 before:to-white/0 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700 border border-white/20"
           >
-            <a href="/auth">
-              Log In
+            <a href="/auth" className="relative z-10 flex items-center gap-2">
+              <span>Log In</span>
+              <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
             </a>
           </Button>
 
@@ -93,10 +94,11 @@ const Index = () => {
             ))}
             <Button
               asChild
-              className="mt-4 bg-gradient-to-r from-primary to-primary/80 text-white"
+              className="mt-4 relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-white rounded-full px-6 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/10 before:to-white/0 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700 border border-white/20"
             >
-              <a href="/auth">
-                Log In
+              <a href="/auth" className="relative z-10 flex items-center gap-2">
+                <span>Log In</span>
+                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
               </a>
             </Button>
           </nav>
