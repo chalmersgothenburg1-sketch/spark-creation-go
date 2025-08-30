@@ -99,7 +99,7 @@ const testimonials = [
 
 export function WhyUsSection() {
   return (
-    <section className="py-20 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+    <section className="py-20 bg-gradient-to-br from-green-50 via-green-100/70 to-green-50 dark:from-green-900/20 dark:via-green-800/10 dark:to-green-900/20">
       <div className="container mx-auto px-6 lg:px-8">
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
