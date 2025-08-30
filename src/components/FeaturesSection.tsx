@@ -57,7 +57,7 @@ const emergencyServices = [
 
 export function FeaturesSection() {
   return (
-    <section className="py-20 bg-muted/50">
+    <section className="py-20 bg-green-50/80 dark:bg-green-900/20">
       <div className="container mx-auto px-6 lg:px-8">
         
         {/* Health Monitoring Features */}
