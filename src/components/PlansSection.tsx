@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, Star } from "lucide-react";
 import { useState } from "react";
-import { PaymentModal } from "./PaymentModal";
+import { PurchaseFlow } from "./PurchaseFlow";
 
 const plans = [
   {
@@ -65,11 +65,11 @@ const plans = [
 
 export function PlansSection() {
   const [selectedPlan, setSelectedPlan] = useState<typeof plans[0] | null>(null);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isPurchaseFlowOpen, setIsPurchaseFlowOpen] = useState(false);
 
   const handleBuyNow = (plan: typeof plans[0]) => {
     setSelectedPlan(plan);
-    setIsPaymentModalOpen(true);
+    setIsPurchaseFlowOpen(true);
   };
 
   return (
@@ -125,7 +125,7 @@ export function PlansSection() {
                   className={`w-full ${
                     plan.popular 
                       ? 'bg-primary hover:bg-primary/90' 
-                      : 'bg-secondary hover:bg-secondary/90'
+                      : 'bg-secondary hover:bg-secondary/90 text-secondary-foreground'
                   }`}
                   size="lg"
                 >
@@ -148,10 +148,11 @@ export function PlansSection() {
         </div>
       </div>
 
-      <PaymentModal
-        isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
+      <PurchaseFlow
+        isOpen={isPurchaseFlowOpen}
+        onClose={() => setIsPurchaseFlowOpen(false)}
         selectedPlan={selectedPlan}
+        allPlans={plans}
       />
     </section>
   );

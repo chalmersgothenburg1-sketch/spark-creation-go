@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, FileText } from "lucide-react";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 export const PrescriptionUpload = () => {
   const [loading, setLoading] = useState(false);
@@ -26,23 +27,16 @@ export const PrescriptionUpload = () => {
 
   const uploadFile = async (file: File): Promise<string | null> => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('prescriptions')
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage
-        .from('prescriptions')
-        .getPublicUrl(fileName);
-
-      return data.publicUrl;
+      // Replace with API upload logic
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch(`${API_BASE_URL}/api/prescriptions/upload`, {
+        method: "POST",
+        body: form
+      });
+      if (!res.ok) throw new Error("Failed to upload file");
+      const data = await res.json();
+      return data.fileUrl;
     } catch (error) {
       console.error('Upload error:', error);
       return null;
@@ -54,8 +48,9 @@ export const PrescriptionUpload = () => {
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
+      // Get user email from localStorage
+      const userEmail = localStorage.getItem("userEmail");
+      if (!userEmail) throw new Error("User not authenticated");
 
       let fileUrl = null;
       const file = fileInputRef.current?.files?.[0];
@@ -67,17 +62,18 @@ export const PrescriptionUpload = () => {
         }
       }
 
-      const { error } = await (supabase as any)
-        .from('prescriptions')
-        .insert({
-          user_id: user.id,
+      const res = await fetch(`${API_BASE_URL}/api/prescriptions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_email: userEmail,
           ...formData,
           file_url: fileUrl,
           start_date: formData.start_date || null,
           end_date: formData.end_date || null
-        });
-
-      if (error) throw error;
+        })
+      });
+      if (!res.ok) throw new Error("Failed to add prescription");
 
       toast.success("Prescription added successfully");
       setFormData({

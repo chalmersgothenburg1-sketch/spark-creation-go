@@ -53,7 +53,7 @@ const faqs = [
 
 export function FAQSection() {
   return (
-    <section className="py-20 bg-gradient-to-b from-green-100/80 via-green-50 to-green-100/60 dark:from-green-900/30 dark:via-green-800/20 dark:to-green-900/30">
+    <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">

@@ -31,7 +31,7 @@ export function CTASection() {
             <Button 
               variant="outline" 
               size="lg" 
-              className="text-lg border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10"
+              className="text-lg border-primary-foreground text-secondary-foreground hover:bg-primary-foreground/10"
             >
               Schedule a Demo
             </Button>

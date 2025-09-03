@@ -6,12 +6,19 @@ import { WhyUsSection } from "@/components/WhyUsSection";
 import { FAQSection } from "@/components/FAQSection";
 import { ContactSection } from "@/components/ContactSection";
 import { CTASection } from "@/components/CTASection";
-import { Heart, Activity, Shield, MessageCircle, Phone, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { Heart, Activity, Shield, MessageCircle, Phone, Menu, X, User, Settings, LogOut } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const Index = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [hasOrderedWatch, setHasOrderedWatch] = useState(false);
+  const navigate = useNavigate();
 
   const navigationItems = [
     { title: "Home", icon: Heart, action: () => window.scrollTo(0, 0) },
@@ -21,13 +28,51 @@ const Index = () => {
     { title: "FAQs", icon: Phone, action: () => document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth' }) },
   ];
 
+  useEffect(() => {
+    // Check if user is logged in
+    const token = localStorage.getItem("access_token");
+    const email = localStorage.getItem("userEmail");
+    
+    if (token && email) {
+      setIsLoggedIn(true);
+      setUserEmail(email);
+      // Simulate checking if user has ordered watch (in real app, this would be an API call)
+      const watchOrdered = localStorage.getItem("hasOrderedWatch") === "true";
+      setHasOrderedWatch(watchOrdered);
+    }
+  }, []);
+
   const handleNavigation = (item: any) => {
     item.action();
     setIsMobileMenuOpen(false);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("uid");
+    localStorage.removeItem("hasOrderedWatch");
+    setIsLoggedIn(false);
+    setUserEmail("");
+    setHasOrderedWatch(false);
+    toast.success("Logged out successfully");
+  };
+
+  const getUsername = (email: string) => {
+    return email.split('@')[0];
+  };
+
+  const handleGetStarted = () => {
+    navigate("/auth");
+  };
+
+  const handleOrderStatus = () => {
+    // Navigate to order status page or show modal
+    toast.info("Order status feature coming soon!");
+  };
+
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-green-900 to-white">
+    <div className="min-h-screen w-full bg-gradient-to-b from-green-700 via-green-300 to-white">
       {/* Modern Header with Navigation */}
       <header className="h-20 flex items-center justify-between border-b border-border/50 bg-background/80 backdrop-blur-md sticky top-0 z-50 px-6 lg:px-8">
         {/* Logo */}
@@ -58,15 +103,36 @@ const Index = () => {
         {/* Right Side Actions */}
         <div className="flex items-center space-x-4">
           {/* <ThemeToggle /> */}
-          <Button
-            asChild
-            className="hidden md:flex relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/90 hover:via-primary/80 hover:to-primary/70 text-white shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 hover:scale-105 rounded-full px-6 py-2.5 font-semibold before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/10 before:to-white/0 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700 border border-white/20"
-          >
-            <a href="/auth" className="relative z-10 flex items-center gap-2">
-              <span>Log In</span>
-              <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-            </a>
-          </Button>
+          {isLoggedIn ? (
+            /* Account Dropdown for Logged In Users */
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center space-x-2">
+                  <User className="h-4 w-4" />
+                  <span className="hidden md:inline">{getUsername(userEmail)}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            /* Login Button for Non-Logged In Users */
+            <Button
+              onClick={() => navigate("/auth")}
+              className="hidden md:flex bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+            >
+              Log In
+            </Button>
+          )}
 
           {/* Mobile Menu Button */}
           <button
@@ -92,22 +158,47 @@ const Index = () => {
                 {item.title}
               </button>
             ))}
-            <Button
-              asChild
-              className="mt-4 relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-white rounded-full px-6 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/10 before:to-white/0 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700 border border-white/20"
-            >
-              <a href="/auth" className="relative z-10 flex items-center gap-2">
-                <span>Log In</span>
-                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-              </a>
-            </Button>
+            {!isLoggedIn && (
+              <Button
+                onClick={() => navigate("/auth")}
+                className="mt-4 bg-gradient-to-r from-primary to-primary/80 text-white"
+              >
+                Log In
+              </Button>
+            )}
+            {isLoggedIn && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="mt-4 flex items-center space-x-2">
+                    <User className="h-4 w-4" />
+                    <span>{getUsername(userEmail)}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </nav>
         </div>
       )}
 
       {/* Page Content */}
       <main className="overflow-auto">
-        <HeroSection />
+        <HeroSection 
+          isLoggedIn={isLoggedIn} 
+          hasOrderedWatch={hasOrderedWatch}
+          onGetStarted={handleGetStarted}
+          onOrderStatus={handleOrderStatus}
+        />
         <div id="features">
           <FeaturesSection />
         </div>

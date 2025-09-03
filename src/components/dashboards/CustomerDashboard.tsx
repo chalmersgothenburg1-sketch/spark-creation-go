@@ -19,6 +19,15 @@ import { BloodPressureDetailModal } from "@/components/BloodPressureDetailModal"
 import { SleepTrackingCard } from "@/components/SleepTrackingCard";
 import { MapCard } from "@/components/MapCard";
 import ActivityCard from "@/components/ActivityCard";
+import type { DashboardData } from "@/types/types"; // adjust import path
+import { SimpleMap } from "@/components/SimpleMap";
+
+interface CustomerDashboardProps {
+  data: DashboardData | null; // allow null while loading
+  devices: any[];
+  selectedDevice: string;
+  onDeviceChange: (id: string) => void;
+}
 
 const healthData = [
   { time: "6:00", heartRate: 68, bloodPressure: 120, steps: 0 },
@@ -71,7 +80,8 @@ const stressData = [
   { time: "21:00", stress: 30 },
 ];
 
-export const CustomerDashboard = () => {
+export const CustomerDashboard = ({ data, devices, selectedDevice, onDeviceChange }: CustomerDashboardProps) => {
+  console.log("realtime api", data);
   const { toast } = useToast();
   const [reportRequest, setReportRequest] = useState("");
   const [showStepsModal, setShowStepsModal] = useState(false);
@@ -107,6 +117,21 @@ export const CustomerDashboard = () => {
 
       {/* Emergency Monitor - Always at top for customers */}
       <EmergencyMonitor />
+      {/* Divider + Device Selector */}
+      <div className="flex items-center justify-between my-4 border-b border-border pb-2">
+        <h2 className="text-sm text-muted-foreground">Devices</h2>
+        <select
+          className="border rounded-md px-2 py-1 text-sm"
+          value={selectedDevice}
+          onChange={(e) => onDeviceChange(e.target.value)}
+        >
+          {devices.map((device) => (
+            <option key={device.id} value={device.id}>
+              {device.model}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Health Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -125,8 +150,8 @@ export const CustomerDashboard = () => {
             </div>
             <div>
               <p className="text-sm text-red-600/70 font-medium">Heart Rate</p>
-              <p className="text-3xl font-bold text-red-700 mb-1">72</p>
-              <p className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full inline-block">Normal Range</p>
+              <p className="text-3xl font-bold text-red-700 mb-1">{ data ? data.heartrate : "--" }</p>
+              <p className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full inline-block">{ data?.stress ? data.stress.toUpperCase() : "N/A" }</p>
             </div>
           </div>
           <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 to-rose-400"></div>
@@ -147,8 +172,8 @@ export const CustomerDashboard = () => {
             </div>
             <div>
               <p className="text-sm text-blue-600/70 font-medium">Daily Steps</p>
-              <p className="text-3xl font-bold text-blue-700 mb-1">10,500</p>
-              <p className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full inline-block">Goal Achieved! 🎉</p>
+              <p className="text-3xl font-bold text-blue-700 mb-1">{ data ? data.total_steps : "--" }</p>
+              <p className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full inline-block">{ data && data.total_steps >= 10000 ? "Goal Achieved! 🎉" : "Keep Going" } </p>
             </div>
           </div>
           <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-indigo-400"></div>
@@ -169,7 +194,7 @@ export const CustomerDashboard = () => {
             </div>
             <div>
               <p className="text-sm text-orange-600/70 font-medium">Blood Pressure</p>
-              <p className="text-3xl font-bold text-orange-700 mb-1">120/80</p>
+              <p className="text-3xl font-bold text-orange-700 mb-1">{data ? `${data.latest_bp_systolic}/${data.latest_bp_diastolic}` : "--"}</p>
               <p className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full inline-block">Normal</p>
             </div>
           </div>
@@ -191,7 +216,7 @@ export const CustomerDashboard = () => {
             </div>
             <div>
               <p className="text-sm text-cyan-600/70 font-medium">SpO2</p>
-              <p className="text-3xl font-bold text-cyan-700 mb-1">98%</p>
+              <p className="text-3xl font-bold text-cyan-700 mb-1">{data ? `${data.latest_o2}%` : "--"}</p>
               <p className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full inline-block">Excellent</p>
             </div>
           </div>
@@ -239,38 +264,51 @@ export const CustomerDashboard = () => {
           </div>
           
           <div className="text-center mb-4">
-            <p className="text-3xl font-bold text-green-700">1,931</p>
+            <p className="text-3xl font-bold text-green-700">{data ? `${data.calories_burned}` : 0}</p>
           </div>
           
           <div className="mb-4">
             <div className="flex justify-between mb-2">
-              <span className="text-sm text-green-600">Active: 540</span>
-              <span className="text-sm text-green-600">Resting: 1,391</span>
+              <span className="text-sm text-green-600">Active: {data?.calories_burned_active ?? 0}</span>
+              <span className="text-sm text-green-600">Resting: {data?.calories_burned_resting ?? 0}</span>
             </div>
             <div className="w-full bg-green-200 rounded-full h-3">
               <div 
                 className="bg-red-500 h-3 rounded-l-full"
-                style={{ width: `${(540/1931) * 100}%` }}
+                style={{
+                width: `${
+                  data && data.calories_burned_resting
+                    ? (data.calories_burned_active / data.calories_burned_resting) * 100
+                    : 0
+                }%`
+              }}
               ></div>
             </div>
           </div>
           
-          <div className="text-center mb-2">
-            <p className="text-xs text-green-600">Last 7d</p>
+          <div className="mt-10">
+            <div className="text-center mb-5">
+              <p className="text-xs text-green-600">Last 7d</p>
+            </div>
+            
+            <ResponsiveContainer width="100%" height={60}>
+              <BarChart data={data?.calories_burned_trend7d ?? []}>
+                <XAxis dataKey="day" tick={{ fontSize: 10 }} />
+                <YAxis hide />
+                <Tooltip />
+                <Bar dataKey="calories" fill="#16a34a" radius={[2, 2, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
-          
-          <ResponsiveContainer width="100%" height={60}>
-            <BarChart data={calorieData}>
-              <Bar dataKey="calories" fill="#16a34a" radius={[2, 2, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
         </Card>
 
         {/* Sleep Tracking Card */}
-        <SleepTrackingCard />
+        <SleepTrackingCard data={data?.sleep_quality ?? null} />
 
         {/* Map Card */}
         <MapCard className="lg:col-span-1" />
+
+        {/* <SimpleMap latitude={23.43} longitude={43.56}/> */}
       </div>
 
      {/* Enhanced Activity Card */}

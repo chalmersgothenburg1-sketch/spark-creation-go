@@ -2,6 +2,24 @@ import { Card } from "@/components/ui/card";
 import { Moon, Clock } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from "recharts";
 
+interface SleepPatternEntry {
+  time: string;
+  status: "awake" | "light" | "deep";
+  duration: number;
+}
+interface SleepMetrics {
+  duration: number;                  // total sleep hours
+  deep_sleep: number;
+  light_sleep: number;
+  sleep_quality_score: number;      // e.g., 85
+  sleep_pattern_timeline: SleepPatternEntry[];
+  sleep_quality_text: string;       // e.g., "Good Sleep Quality (85%)"
+}
+
+interface SleepTrackingCardProps {
+  data: SleepMetrics | null;
+}
+
 const sleepData = [
   { time: "9 PM", status: "awake", duration: 1 },
   { time: "10 PM", status: "light", duration: 1 },
@@ -25,10 +43,10 @@ const getBarColor = (status: string) => {
   }
 };
 
-export const SleepTrackingCard = () => {
-  const totalSleep = sleepData.filter(d => d.status !== "awake").length;
-  const deepSleep = sleepData.filter(d => d.status === "deep").length;
-  const lightSleep = sleepData.filter(d => d.status === "light").length;
+export const SleepTrackingCard = ({data} : SleepTrackingCardProps) => {
+  const totalSleep = data?.duration && !isNaN(data.duration) ? Math.floor(data.duration) : 0;
+  const deepSleep = data?.deep_sleep && !isNaN(data.deep_sleep) ? Math.floor(data.deep_sleep) : 0;
+  const lightSleep = data?.light_sleep && !isNaN(data.light_sleep) ? Math.floor(data.light_sleep) : 0;
   
   return (
     <Card className="group relative overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-100 border-indigo-200 hover:shadow-lg transition-all duration-300">
@@ -43,7 +61,11 @@ export const SleepTrackingCard = () => {
           </div>
           <div className="flex items-center gap-2 text-indigo-600">
             <Clock className="h-4 w-4" />
-            <span className="text-sm font-medium">8h 15m</span>
+            <span className="text-sm font-medium">
+              {totalSleep && !isNaN(totalSleep) ? 
+              (`${Math.floor(totalSleep)}h ${Math.round((totalSleep % 1) * 60)}m`) : 
+              ("0h 0m")}
+            </span>
           </div>
         </div>
 
@@ -69,7 +91,7 @@ export const SleepTrackingCard = () => {
           <div className="bg-white/60 p-4 rounded-lg border border-indigo-200/50">
             <ResponsiveContainer width="100%" height={80}>
               <BarChart
-                data={sleepData}
+                data={data?.sleep_pattern_timeline ?? []}
                 layout="horizontal"
                 margin={{ top: 5, right: 30, left: 60, bottom: 5 }}
               >
@@ -81,7 +103,7 @@ export const SleepTrackingCard = () => {
                   width={50}
                 />
                 <Bar dataKey="duration" radius={[0, 2, 2, 0]}>
-                  {sleepData.map((entry, index) => (
+                  {(data?.sleep_pattern_timeline ?? []).map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={getBarColor(entry.status)} />
                   ))}
                 </Bar>
@@ -110,7 +132,7 @@ export const SleepTrackingCard = () => {
         <div className="mt-4 text-center">
           <div className="inline-flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full border border-green-200">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-green-700">Good Sleep Quality (85%)</span>
+            <span className="text-sm font-medium text-green-700">{data?.sleep_quality_text ?? "Sleep Quality Unavailable"}</span>
           </div>
         </div>
       </div>

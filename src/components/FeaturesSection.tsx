@@ -57,7 +57,7 @@ const emergencyServices = [
 
 export function FeaturesSection() {
   return (
-    <section className="py-20 bg-green-50/80 dark:bg-green-900/20">
+    <section className="py-20 bg-muted/50">
       <div className="container mx-auto px-6 lg:px-8">
         
         {/* Health Monitoring Features */}
@@ -92,7 +92,7 @@ export function FeaturesSection() {
                     <div className="p-2 bg-muted rounded-lg">
                       <feature.icon className={`h-6 w-6 ${feature.color}`} />
                     </div>
-                    <CardTitle className="text-lg">{feature.title}</CardTitle>
+                    <CardTitle className="text-lg text-foreground">{feature.title}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>

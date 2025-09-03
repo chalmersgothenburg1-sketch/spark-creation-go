@@ -3,13 +3,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, Activity, Moon, Footprints, Thermometer } from "lucide-react";
+import { Heart, Activity, Moon, Footprints, Thermometer, Battery } from "lucide-react";
 
 interface HealthMetric {
   id: string;
   metric_type: string;
-  value: any;
+  value: number | { value: number };
   recorded_at: string;
+}
+
+interface DashboardData {
+  latest_bp_systolic: number;
+  latest_bp_diastolic: number;
+  latest_o2: number;
+  latest_battery: number;
+  latest_latitude: number;
+  latest_longitude: number;
+  steps_hourly: Record<string, number>;
+  total_steps: number;
+  activity_log_hourly: Record<string, Array<{ timestamp: string; activity: string; latitude: number; longitude: number }>>;
+  sleeping_time_hourly: Record<string, string[]>;
+  heartrate_hourly_avg: Record<string, number | null>;
 }
 
 const chartConfig = {
@@ -31,50 +45,52 @@ const chartConfig = {
   },
 } as const;
 
-export const HealthCharts = () => {
+export const HealthCharts = ({ dashboardData }: { dashboardData: DashboardData | null }) => {
+  // Prepare heart rate hourly average data for 24 hours
+  const heartRateData = dashboardData && dashboardData.heartrate_hourly_avg
+    ? Object.entries(dashboardData.heartrate_hourly_avg).map(([hour, avg]) => ({
+        time: hour,
+        value: avg === null ? 0 : Number(avg)
+      }))
+    : [];
   const [metrics, setMetrics] = useState<HealthMetric[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchHealthMetrics();
-    
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('health-metrics-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'health_metrics'
-        },
-        () => {
-          fetchHealthMetrics();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const fetchHealthMetrics = async () => {
-    try {
-      const { data: metrics, error } = await (supabase as any)
-        .from('health_metrics')
-        .select('*')
-        .order('recorded_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-      setMetrics(metrics || []);
-    } catch (error) {
-      console.error('Error fetching health metrics:', error);
-    } finally {
+    if (!dashboardData) {
+      setMetrics([]);
       setLoading(false);
+      return;
     }
-  };
+    // Populate metrics from dashboardData
+    setMetrics([
+      {
+        id: "bp_systolic",
+        metric_type: "heart_rate",
+        value: dashboardData.latest_bp_systolic,
+        recorded_at: new Date().toISOString(),
+      },
+      {
+        id: "steps",
+        metric_type: "steps",
+        value: dashboardData.total_steps,
+        recorded_at: new Date().toISOString(),
+      },
+      {
+        id: "sleep",
+        metric_type: "sleep",
+        value: Object.values(dashboardData.sleeping_time_hourly).flat().length,
+        recorded_at: new Date().toISOString(),
+      },
+      {
+        id: "battery",
+        metric_type: "battery",
+        value: dashboardData.latest_battery,
+        recorded_at: new Date().toISOString(),
+      },
+    ]);
+    setLoading(false);
+  }, [dashboardData]);
 
   const getMetricsByType = (type: string) => {
     return metrics
@@ -93,6 +109,30 @@ export const HealthCharts = () => {
     if (!latest) return 0;
     return typeof latest.value === 'object' ? latest.value.value : latest.value;
   };
+
+  // Prepare daily steps data for 24 hours
+  const stepsData = dashboardData
+    ? Object.entries(dashboardData.steps_hourly).map(([hour, steps]) => ({
+        time: hour,
+        value: steps as number
+      }))
+    : [];
+
+  // Prepare sleep data for 24 hours (hour, sleep count)
+  const sleepData = dashboardData
+    ? Object.entries(dashboardData.sleeping_time_hourly).map(([hour, arr]) => ({
+        time: hour,
+        value: Array.isArray(arr) ? arr.length : 0
+      }))
+    : [];
+
+  // Prepare activity data for 24 hours (hour, activity count)
+  const activityData = dashboardData
+    ? Object.entries(dashboardData.activity_log_hourly).map(([hour, arr]) => ({
+        time: hour,
+        value: Array.isArray(arr) ? arr.length : 0
+      }))
+    : [];
 
   const metricCards = [
     {
@@ -120,11 +160,11 @@ export const HealthCharts = () => {
       color: 'text-purple-500'
     },
     {
-      type: 'temperature',
-      title: 'Body Temperature',
-      value: getCurrentValue('temperature'),
-      unit: '°F',
-      icon: Thermometer,
+      type: 'battery',
+      title: 'Battery Percentage',
+      value: getCurrentValue('battery'),
+      unit: '%',
+      icon: Battery,
       color: 'text-orange-500'
     }
   ];
@@ -174,29 +214,36 @@ export const HealthCharts = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Heart Rate Chart */}
+        {/* Heart Rate Chart (Hourly BarChart) */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
               <Heart className="h-5 w-5 mr-2 text-red-500" />
-              Heart Rate Trend
+              Heart Rate
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={getMetricsByType('heart_rate')}>
+            <ChartContainer config={chartConfig} className="h-[250px]">
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart
+                  data={heartRateData}
+                  barCategoryGap={2}
+                  barGap={1}
+                  margin={{ top: 10, right: 10, left: 10, bottom: 30 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="var(--color-heart_rate)" 
-                    strokeWidth={2}
+                  <XAxis 
+                    dataKey="time" 
+                    interval={0} 
+                    angle={-45} 
+                    textAnchor="end" 
+                    height={60}
+                    tick={{ fontSize: 10 }}
                   />
-                </LineChart>
+                  <YAxis tick={{ fontSize: 10 }} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="value" fill="var(--color-heart_rate)" minPointSize={2} maxBarSize={12} />
+                </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
@@ -211,21 +258,33 @@ export const HealthCharts = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={getMetricsByType('steps')}>
+            <ChartContainer config={chartConfig} className="h-[250px]">
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart
+                  data={stepsData}
+                  barCategoryGap={2}
+                  barGap={1}
+                  margin={{ top: 10, right: 10, left: 10, bottom: 30 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis />
+                  <XAxis 
+                    dataKey="time" 
+                    interval={0} 
+                    angle={-45} 
+                    textAnchor="end" 
+                    height={60}
+                    tick={{ fontSize: 10 }}
+                  />
+                  <YAxis tick={{ fontSize: 10 }} />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="value" fill="var(--color-steps)" />
+                  <Bar dataKey="value" fill="var(--color-steps)" minPointSize={2} maxBarSize={12} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
 
-        {/* Sleep Chart */}
+        {/* Sleep Chart (Hourly BarChart) */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -234,48 +293,62 @@ export const HealthCharts = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={getMetricsByType('sleep')}>
+            <ChartContainer config={chartConfig} className="h-[250px]">
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart
+                  data={sleepData}
+                  barCategoryGap={2}
+                  barGap={1}
+                  margin={{ top: 10, right: 10, left: 10, bottom: 30 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="var(--color-sleep)" 
-                    strokeWidth={2}
+                  <XAxis 
+                    dataKey="time" 
+                    interval={0} 
+                    angle={-45} 
+                    textAnchor="end" 
+                    height={60}
+                    tick={{ fontSize: 10 }}
                   />
-                </LineChart>
+                  <YAxis tick={{ fontSize: 10 }} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="value" fill="var(--color-sleep)" minPointSize={2} maxBarSize={12} />
+                </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
 
-        {/* Temperature Chart */}
+        {/* Activity Chart (Hourly BarChart) */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Thermometer className="h-5 w-5 mr-2 text-orange-500" />
-              Body Temperature
+              <Activity className="h-5 w-5 mr-2 text-orange-500" />
+              Activity Monitor
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={getMetricsByType('temperature')}>
+            <ChartContainer config={chartConfig} className="h-[250px]">
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart
+                  data={activityData}
+                  barCategoryGap={2}
+                  barGap={1}
+                  margin={{ top: 10, right: 10, left: 10, bottom: 30 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis domain={[96, 102]} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="var(--color-temperature)" 
-                    strokeWidth={2}
+                  <XAxis 
+                    dataKey="time" 
+                    interval={0} 
+                    angle={-45} 
+                    textAnchor="end" 
+                    height={60}
+                    tick={{ fontSize: 10 }}
                   />
-                </LineChart>
+                  <YAxis tick={{ fontSize: 10 }} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="value" fill="var(--chart-4)" minPointSize={2} maxBarSize={12} />
+                </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
