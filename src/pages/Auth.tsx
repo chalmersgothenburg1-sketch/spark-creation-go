@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,121 +8,75 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Eye, EyeOff, Heart } from "lucide-react";
-import { PlansSection } from "@/components/PlansSection";
-import { ContactSection } from "@/components/ContactSection";
-import { OTPVerification } from "@/components/OTPVerification";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Auth = () => {
+  const { signUp, signIn, user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState(""); // Can be email or username
   const [password, setPassword] = useState("");
-  const [showOTP, setShowOTP] = useState(false);
-  const [signupEmail, setSignupEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const navigate = useNavigate();
 
-  const signUp = async (email: string, password: string) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/users/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        return { error: { message: data.message || "Signup failed" } };
-      }
-      return { error: null };
-    } catch (err) {
-      return { error: { message: "Network error" } };
+  // Redirect if user is already authenticated
+  useEffect(() => {
+    if (user && !authLoading) {
+      navigate("/dashboard");
     }
-  };
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        return { error: { message: data.detail || "Login failed" } };
-      }
-      // Save token, uid, and email in localStorage
-      localStorage.setItem("access_token", data.access_token);
-      localStorage.setItem("userEmail", email);
-      if (data.uid) {
-        localStorage.setItem("uid", data.uid);
-      }
-      return { error: null };
-    } catch (err) {
-      return { error: { message: "Network error" } };
-    }
-  };
-
-  // const signInWithGoogle = async () => {
-  //   const { error } = await supabase.auth.signInWithOAuth({
-  //     provider: 'google',
-  //     options: {
-  //       redirectTo: `${window.location.origin}/dashboard`
-  //     }
-  //   });
-  //   if (error) {
-  //     toast.error("Failed to sign in with Google");
-  //   }
-  // };
-
-  // const signInWithFacebook = async () => {
-  //   const { error } = await supabase.auth.signInWithOAuth({
-  //     provider: 'facebook',
-  //     options: {
-  //       redirectTo: `${window.location.origin}/dashboard`
-  //     }
-  //   });
-  //   if (error) {
-  //     toast.error("Failed to sign in with Facebook");
-  //   }
-  // };
+  }, [user, authLoading, navigate]);
 
   const handleAuth = async (type: 'signin' | 'signup') => {
-    if (!email || !password) {
-      toast.error("Please fill in all fields");
-      return;
+    if (type === 'signup') {
+      if (!email || !password || !username) {
+        toast.error("Please fill in all required fields");
+        return;
+      }
+    } else {
+      if (!identifier || !password) {
+        toast.error("Please fill in all fields");
+        return;
+      }
     }
 
     setLoading(true);
     try {
       if (type === 'signup') {
-        const { error } = await signUp(email, password);
+        const { error } = await signUp(email, password, username, firstName, lastName);
         if (error) {
-          if (error.message.toLowerCase().includes("exists")) {
+          if (error.message?.toLowerCase().includes("already registered")) {
             toast.error("An account with this email already exists. Please sign in instead.");
+          } else if (error.message?.toLowerCase().includes("unique")) {
+            toast.error("Username already taken. Please choose a different username.");
           } else {
-            toast.error(error.message);
+            toast.error(error.message || "Signup failed");
           }
           return;
         }
         
-        // Show OTP verification for signup
-        setSignupEmail(email);
-        setShowOTP(true);
-        toast.success("Account created! Please verify your email.");
+        toast.success("Account created! Please check your email to verify your account.");
+        // Reset form
+        setEmail("");
+        setPassword("");
+        setUsername("");
+        setFirstName("");
+        setLastName("");
       } else {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(identifier, password);
         if (error) {
-          if (error.message.toLowerCase().includes("invalid")) {
-            toast.error("Invalid email or password");
+          if (error.message?.toLowerCase().includes("invalid")) {
+            toast.error("Invalid email/username or password");
           } else {
-            toast.error(error.message);
+            toast.error(error.message || "Login failed");
           }
           return;
         }
         
         toast.success("Signed in successfully!");
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch (error) {
       toast.error("An unexpected error occurred");
@@ -131,18 +85,6 @@ export const Auth = () => {
     }
   };
 
-  const handleOTPVerified = () => {
-    setShowOTP(false);
-    toast.success("Email verified successfully! You can now sign in.");
-    // Reset form and switch to signin tab
-    setEmail("");
-    setPassword("");
-  };
-
-  const handleBackFromOTP = () => {
-    setShowOTP(false);
-    setSignupEmail("");
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center justify-center p-4">
@@ -157,13 +99,7 @@ export const Auth = () => {
           </p>
         </div>
 
-        {showOTP ? (
-          <OTPVerification
-            email={signupEmail}
-            onBack={handleBackFromOTP}
-            onVerified={handleOTPVerified}
-          />
-        ) : (
+        {(
           <Card>
             <CardHeader>
               <CardTitle className="text-center">Welcome</CardTitle>
@@ -178,13 +114,13 @@ export const Auth = () => {
                 <TabsContent value="signin" className="space-y-4 mt-4">
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="signin-email">Email</Label>
+                      <Label htmlFor="signin-identifier">Email or Username</Label>
                       <Input
-                        id="signin-email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email"
+                        id="signin-identifier"
+                        type="text"
+                        value={identifier}
+                        onChange={(e) => setIdentifier(e.target.value)}
+                        placeholder="Enter your email or username"
                         required
                       />
                     </div>
@@ -233,8 +169,41 @@ export const Auth = () => {
                 
                 <TabsContent value="signup" className="space-y-4 mt-4">
                   <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="first-name">First Name</Label>
+                        <Input
+                          id="first-name"
+                          type="text"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          placeholder="First name"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="last-name">Last Name</Label>
+                        <Input
+                          id="last-name"
+                          type="text"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          placeholder="Last name"
+                        />
+                      </div>
+                    </div>
                     <div>
-                      <Label htmlFor="signup-email">Email</Label>
+                      <Label htmlFor="signup-username">Username *</Label>
+                      <Input
+                        id="signup-username"
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Choose a username"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="signup-email">Email *</Label>
                       <Input
                         id="signup-email"
                         type="email"
@@ -245,7 +214,7 @@ export const Auth = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="signup-password">Password</Label>
+                      <Label htmlFor="signup-password">Password *</Label>
                       <div className="relative">
                         <Input
                           id="signup-password"
